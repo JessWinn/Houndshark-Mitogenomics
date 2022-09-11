@@ -11,10 +11,10 @@
 ## STEP 4: Mitophylogenomics
 
 ### STEP 4.1: Ingroup and outgroup mitogenome retrieval from GenBank 
-First, compile a list of mitochondrial genomes of the order Carcharhiniformes from Kousteni *et al*. (2021) and Wang *et al*. (2022), which include additional outgroup representatives from the orders Lamniformes and Orectolobiformes, and save the the text file as ***STEP-1_mitogenomes_genebak.list***. Second, use the file ***STEP-1_mitogenomes_genebak.list*** to retrieve records from GenBank using [Batch Entrez](https://www.ncbi.nlm.nih.gov/sites/batchentrez) to download the entire mitogenome records in GenBank (full) format. Last, save the file as 'kousteni-wang.gb' in a folder named ***data***, already containing newly assembled mitogenomes also in GenBank (full) format.
+First, compile a list of mitochondrial genomes of the order Carcharhiniformes from Kousteni *et al*. (2021) and Wang *et al*. (2022), which include additional outgroup representatives from the orders Lamniformes and Orectolobiformes, and save the the text file as `kousteni-wang_mitogenomes_genbank.list`. Second, use the file `STEP-1_mitogenomes_genebak.list` to retrieve records from GenBank using [Batch Entrez](https://www.ncbi.nlm.nih.gov/sites/batchentrez) to download the entire mitogenome records in GenBank (full) format. Last, save the file as 'kousteni-wang.gb' in a folder named `data´, already containing newly assembled mitogenomes also in GenBank (full) format.
 
 ### STEP 4.2: Gene region extrations
-First, within the ***data*** folder, merge all the newely assembled mitogenome .gb files with those obtained from GenBank in the the preceeding step.
+First, within the `data´ folder, merge all the newely assembled mitogenome .gb files with those obtained from GenBank in the the preceeding step.
 ```
 cat *.gb > winn_2022.gb
 ```
@@ -26,12 +26,12 @@ gbseqextractor -f winn_2022.gb -prefix winn_2022 -types CDS -s	# output file 'wi
 Third, merge the rNRA and CDS fasta files.
 ```
 cat winn_2022.rrna.fasta winn_2022.cds.fasta > winn_2022.cds-rrna.fasta
-	# Using Notepad+++, edit the file 'winn_2022.cds-rrna.fasta' to standardize gene names.
+	# Using Notepad+++, edit the file ´winn_2022.cds-rrna.fasta´ to standardize gene names.
 	# For instance, some GenBank records call 12S rRNA as s-rRNA, 12S ribosomal RNA or rrnS,
 	# CO1 as COX1, ND2 as nad2 etc. Standardize all genes to the following code: 
 	# 'ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA'.
-  # Save the edited file as 'winn_2022.cds-rrna.std.fasta'.
+  # Save the edited file as `winn_2022.cds-rrna.std.fasta´.
 ```
-Finally, extract individual gene sequences from 'winn_2022.cds-rrna.fasta' using the custom script `winn2022-gene-extractions.sh`:
+Finally, extract individual gene sequences from `winn_2022.cds-rrna.std.fasta´ using the custom script `**winn2022-gene-extractions.sh**`:
 
 
