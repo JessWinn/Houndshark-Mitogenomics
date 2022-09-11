@@ -37,7 +37,7 @@ cat winn_2022.rrna.fasta winn_2022.cds.fasta > winn_2022.cds-rrna.fasta
 	# 'ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA'.
 	# Save the edited file as `winn_2022.cds-rrna.std.fasta´.
 ```
-Finally, extract individual gene sequences (.fa) from `winn_2022.cds-rrna.std.fasta´ using the custom script `winn2022-gene-extractions.sh`:
+Finally, extract individual gene sequences (.fa) from `winn_2022.cds-rrna.std.fasta´ using the custom script `maduna2022-gene-extractions.sh`:
 ```
 #!/bin/bash
 
@@ -68,7 +68,7 @@ ls 2RNAs/*.fa | wc -l # folder should have 2 .fa files
 mv *.fa 13PCGs/
 ls 13PCGs/*.fa | wc -l # folder should have 13 .fa files
 ```
-Second, download the the most recent release of [MACSE](https://bioweb.supagro.inra.fr/macse/) and copy the .jar file, 'macse_v2.06.jar' at present, into the ´13PCGs/´. We checked that sequecens were in the correct orientation and made adjustments accordingly in MEGA. Then we aligned the protein coding genes using the for loop script `winn2022-13pcgs-msa.sh`.
+Second, download the the most recent release of [MACSE](https://bioweb.supagro.inra.fr/macse/) and copy the .jar file, 'macse_v2.06.jar' at present, into the ´13PCGs/´. We checked that sequecens were in the correct orientation and made adjustments accordingly in MEGA. Then we aligned the protein coding genes using the for loop script `maduna2022-13pcgs-msa.sh`.
 ```
 datadir=./13PCGs
 for i in $datadir/*.fa
