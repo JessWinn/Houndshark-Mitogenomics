@@ -18,10 +18,20 @@ First, within the ***data*** folder, merge all the newely assembled mitogenome .
 ```
 cat *.gb > winn_2022.gb
 ```
-Second, extract rNRA and CDS DNA sequences from Genbank file using [GBSEQEXTRACTOR v.0.0.4](https://github.com/linzhi2013/gbseqextractor)
+Second, extract rNRA and CDS DNA sequences from Genbank file using [GBSEQEXTRACTOR v.0.0.4](https://github.com/linzhi2013/gbseqextractor).
 ```
 gbseqextractor -f winn_2022.gb -prefix winn_2022 -types rRNA -s # output file 'winn_2022.rrna.fasta'
 gbseqextractor -f winn_2022.gb -prefix winn_2022 -types CDS -s	# output file 'winn_2022.cds.fasta'
 ```
+Third, merge the rNRA and CDS fasta files.
+```
+cat winn_2022.rrna.fasta winn_2022.cds.fasta > winn_2022.cds-rrna.fasta
+	# Using Notepad+++, edit the file 'winn_2022.cds-rrna.fasta' to standardize gene names.
+	# For instance, some GenBank records call 12S rRNA as s-rRNA, 12S ribosomal RNA or rrnS,
+	# CO1 as COX1, ND2 as nad2 etc. Standardize all genes to the following code: 
+	# 'ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA'.
+  # Save the edited file as 'winn_2022.cds-rrna.std.fasta'.
+```
+Finally, extract individual gene sequences from 'winn_2022.cds-rrna.fasta' using the custom script `winn2022-gene-extractions.sh`:
 
 
