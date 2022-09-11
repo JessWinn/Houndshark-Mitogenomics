@@ -2,11 +2,16 @@
 ***[Simo: I am struggling to follow your workflow. May you please name your scripts appropriately i.e STEP-1_XXXX, STEP-2_XXX?]***
 
 ## STEP 1: Quality Control of Ion GeneStudio™ S5 data
+
 ***[Simo: How was quality control carried out? Provide a brief description of how the (1) sequence quality was checked, (2) low quality bases were trimmed and (3) adapters contamination was checked and removed.]***
 
 ## STEP 2: Mitogenome assemblies  
 
+***[Simo: Please add a guideline for the graphical front end software and code for command line interphase software for the different assembly approaches you used]***
+
 ## STEP 3: Mitogenome annotations
+
+***[Simo: Please add a guideline for the graphical front end software and code for command line interphase software for the different annotation approaches you used]***
 
 ## STEP 4: Sequence alignments and concatenation
 
