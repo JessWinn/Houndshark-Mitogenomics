@@ -8,8 +8,7 @@
 
 ## STEP 3: Mitogenome annotations
 
-## STEP 4: Mitophylogenomics
-***Part 1: Sequence alignment and concatenation***
+## STEP 4: Sequence alignments and concatenation
 
 ### STEP 4.1: Ingroup and outgroup mitogenome retrieval from GenBank 
 First, compile a list of mitochondrial genomes of the order Carcharhiniformes from Kousteni *et al*. (2021) and Wang *et al*. (2022), which include additional outgroup representatives from the orders Lamniformes and Orectolobiformes, and save the the text file as `kousteni-wang_mitogenomes_genbank.list`. Second, use the file `STEP-1_mitogenomes_genebak.list` to retrieve records from GenBank using [Batch Entrez](https://www.ncbi.nlm.nih.gov/sites/batchentrez) to download the entire mitogenome records in GenBank (full) format. Last, save the file as 'kousteni-wang.gb' in a folder named `1_data´, already containing newly assembled mitogenomes also in GenBank (full) format.
@@ -78,7 +77,10 @@ Third, we opted to alig the rRNA genes using the online version of [MAFFT (versi
 Fourth, we visually inspect and manually edit alignments using MEGA X. We removed terminal stop codons from the PCG alignments and trimmed alignements to a sequence lenght is divisible by 3. When needed, used BMGE (Block Mapping and Gathering with Entropy) to remove any remaining ambiguously aligned sites. For the RNAs, we used BMGE to remove ambiguously aligned sites.
 Finally, before mitophylogenomic analysis, we produced three concatenated mitogenomic datasets from (i) the aligned individual PCGs datasets (Dataset 1: 13PCGs_NT dataset), (ii) the 13 PCGs plus the two rRNA genes (Dataset 2: 13PCGs_rRNAs_NT dataset) with the R package concatipede v1.0.1 (Vecchi and Bruneaux, 2021), and (iii) we derived the third mitogenomic dataset by translating the 13PCGs_NT dataset in MEGA (Dataset 3: 13PCGs_AA dataset). 
 
-## STEP 4: Mitophylogenomics
+## STEP 5: Substitution saturation and data partitioning schemes 
+
+
+## STEP 6: Phylogenetic reconstructions 
 
 
 
