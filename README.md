@@ -37,7 +37,7 @@ cat winn_2022.rrna.fasta winn_2022.cds.fasta > winn_2022.cds-rrna.fasta
 	# 'ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA'.
 	# Save the edited file as `winn_2022.cds-rrna.std.fasta´.
 ```
-Finally, extract individual gene sequences (.fa) from `winn_2022.cds-rrna.std.fasta´ using the custom script `maduna2022-gene-extractions.sh´:
+Finally, extract individual gene sequences (.fa) from `winn_2022.cds-rrna.std.fasta` using the custom script `maduna2022-gene-extractions.sh`:
 ```
 #!/bin/bash
 
