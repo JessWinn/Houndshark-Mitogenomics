@@ -37,7 +37,7 @@ cat winn_2022.rrna.fasta winn_2022.cds.fasta > winn_2022.cds-rrna.fasta
 	# 'ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA'.
 	# Save the edited file as `winn_2022.cds-rrna.std.fasta´.
 ```
-Finally, extract individual gene sequences (.fa) from `winn_2022.cds-rrna.std.fasta´ using the custom script `maduna2022-gene-extractions.sh`:
+Finally, extract individual gene sequences (.fa) from `winn_2022.cds-rrna.std.fasta´ using the custom script `maduna2022-gene-extractions.sh´:
 ```
 #!/bin/bash
 
@@ -60,7 +60,7 @@ for f in *.fa
 
 ### STEP 4.3: Multiple Sequence Alignment
 Align protein coding genes using MACSE2 and rRNA genes using MAFFT (Q-INS-i algorithm).
-First, we must create a new folder called ´2_MSA´ and move .fa files of 13 PCGs to a subfolder called ´13PCGs´ and the 2 rRNA genes to a subfolder called  ´2RNAs´.
+First, we must create a new folder called `2_MSA´ and move .fa files of 13 PCGs to a subfolder called `13PCGs´ and the 2 rRNA genes to a subfolder called  `2RNAs´.
 ```
 mkdir 13PCGs 2RNAs
 mv *rRNA*.fa 2RNAs/
