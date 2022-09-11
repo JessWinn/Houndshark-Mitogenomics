@@ -15,6 +15,8 @@
 
 ## STEP 4: Sequence alignments and concatenation
 
+***[Simo: This is my workflow for the data I gathered. The objective here is too streamline the workflow and make it reproducible. You will need to edit accordingly for your dataset. I wrote how I did things from my side.]***
+
 ### STEP 4.1: Ingroup and outgroup mitogenome retrieval from GenBank 
 First, compile a list of mitochondrial genomes of the order Carcharhiniformes from Kousteni *et al*. (2021) and Wang *et al*. (2022), which include additional outgroup representatives from the orders Lamniformes and Orectolobiformes, and save the the text file as `kousteni-wang_mitogenomes_genbank.list`. Second, use the file `STEP-1_mitogenomes_genebak.list` to retrieve records from GenBank using [Batch Entrez](https://www.ncbi.nlm.nih.gov/sites/batchentrez) to download the entire mitogenome records in GenBank (full) format. Last, save the file as 'kousteni-wang.gb' in a folder named `1_data´, already containing newly assembled mitogenomes also in GenBank (full) format.
 
