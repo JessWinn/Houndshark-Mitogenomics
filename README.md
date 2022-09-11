@@ -32,6 +32,26 @@ cat winn_2022.rrna.fasta winn_2022.cds.fasta > winn_2022.cds-rrna.fasta
 	# 'ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA'.
   # Save the edited file as `winn_2022.cds-rrna.std.fasta´.
 ```
-Finally, extract individual gene sequences from `winn_2022.cds-rrna.std.fasta´ using the custom script `**winn2022-gene-extractions.sh**`:
+Finally, extract individual gene sequences from `winn_2022.cds-rrna.std.fasta´ using the custom script `winn2022-gene-extractions.sh`:
+```
+#!/bin/bash
+
+GENE=('ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4;' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA')
+
+	for g in "${GENE[@]}"
+	do
+		awk '{ if ((NR>1)&&($0~/^>/)) { printf("\n%s", $0); } else if (NR==1) \
+		{ printf("%s", $0); } else { printf("\t%s", $0); } }' \
+		Winn_2022.cds-rrna.fasta | grep -F  $g - | tr "\t" "\n" > "${g}".fa
+	done
+
+mv 'ND4;.fa' ND4.fa
+
+for f in *.fa
+	do
+		sed -i 's/;/_/g' $f
+	done 
+```
+
 
 
