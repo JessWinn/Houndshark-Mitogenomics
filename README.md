@@ -5,13 +5,78 @@
 
 ***[Simo: How was quality control carried out? Provide a brief description of how the (1) sequence quality was checked, (2) low quality bases were trimmed and (3) adapters contamination was checked and removed.]***
 
+Check quality of the sequence in FastQC (https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
+```
+Trim adaptors and poor-quality bases (phred score below 16) and remove reads shorter than 25 base pairs (bp) with Torrent Suite Software 5.16.
+```
+
 ## STEP 2: Mitogenome assemblies  
 
 ***[Simo: Please add a guideline for the graphical front end software and code for command line interphase software for the different assembly approaches you used]***
 
+### STEP 2.1: reference-based assembly
+Align raw reads to the Mustelus mustelus mitogenome (NC_039629.1) using the Geneious read mapper with medium sensitivity settings and five iterations in Geneious Prime (version 2019.1.3).
+```
+### STEP 2.2: baited assembly
+Extract reads that mapped to the reference genome in bam format.
+```
+Feed the reads into a de novo pipeline in SPAdes version 3.15 with the input set for unpaired Ion Torrent reads with 8 threads, kmers 21,33,55,77,99,127, the careful option to reduce the number of mismatches and short indels and all other parameters left as default.
+```
+EXAMPLE - Mustelus palumbes
+```
+#!/bin/bash
+module load app/SPAdes
+spades.py \
+	-k 21,33,55,77,99,127 \
+	-t 8 \
+	-m 250 \  
+	--iontorrent \ 
+	-s $work/Mpa.bam \
+	--careful \
+	-o $work/Mpa \
+```
+### STEP 2.3: de novo assembly
+Directly map raw reads (bam format) de novo
+```
+EXAMPLE - Mustelus palumbes
+```
+#!/bin/bash
+module load app/SPAdes
+spades.py \
+	-k 21,33,55,77,99,127 \
+	-t 8 \
+	-m 250 \  
+	--iontorrent \ 
+	-s $work/IonCode_0192_rawlib.basecaller.bam \
+	--careful \
+	-o $work/Mpa \
+```
+STEP 2.4: assembly comparison
+Align the three assemblies to each other using the Geneious alignment tool with default parameters. 
+```
+Check each alignment for discrepancies on  Geneious and ediit maually to obtain the final genome sequence.
+```
+
 ## STEP 3: Mitogenome annotations
 
 ***[Simo: Please add a guideline for the graphical front end software and code for command line interphase software for the different annotation approaches you used]***
+
+Annotate protein coding genes (PCGs), ribosomal (r)RNA and transfer (t)RNA genes using MitoAnnotator in MitoFish version 3.72 (Iwasaki et al., 2013; Sato et al., 2018). 
+```
+Input the gene features file from MitoAnnotator into Sequence Manipulation Suite 2 (Stothard, 2000) (set to Table 2 - vertebrate mitochondrial DNA) to check that the reading frame is correct for each PCG (no internal stop codons). 
+```
+Check the annotated sequences in Geneious to ensure completeness and to manually count overlapping regions and intergenic spaces between PCGs, rRNAs, tRNAs, and non-coding regions. 
+```
+Calculate A+T and G+T content and relative synonymous codon usage (RSCU) of PCGs in DAMBE v. 7.0.35 (Xia, 2001). Base composition skewness formula: AT-skew = [A-T]/[A + T] and GC-skew = [G-C]/[G + C] (Perna and Kocher, 1995). 
+```
+Predict tRNA secondary structure using the generalized vertebrate mitochondrial tRNA settings in ARWEN v. 1.2.3 (Björn Canbäck Bioinformatics) (Laslett and Canbäck, 2008) and the tRNAscanSE webserver v. 2.0 (http://lowelab.ucsc.edu/cgi-bin/tRNAscan-SE2.cgi) (Lowe and Chan, 2016).
+```
+Characterise control region repetitive regions using the “Tandem Repeat Finder” webserver (https://tandem.bu.edu/trf/trf.html) (Benson, 1999) maintaining default settings. 
+```
+Construct circular annotated mitogenome visuals using CGView Server v. 1.0 (Stothard and Wishart, 2005). 
+```
+Deposit the annotated mitochondrial genomes on the GenBank repository under the accession numbers ON075075, ON075076, ON075077, ON652873, and ON652874.
+```
 
 ## STEP 4: Sequence alignments and concatenation
 
@@ -88,6 +153,3 @@ Finally, before mitophylogenomic analysis, we produced three concatenated mitoge
 
 
 ## STEP 6: Phylogenetic reconstructions 
-
-
-
