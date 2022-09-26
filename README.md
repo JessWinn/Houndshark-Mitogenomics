@@ -136,5 +136,182 @@ Finally, before mitophylogenomic analysis, we produced three concatenated mitoge
 
 ## STEP 5: Substitution saturation and data partitioning schemes 
 
+### STEP 5.1: construct 10 partition nexus files, two for dataset 1, six for dataset 2 and two for dataset 3.
+Dataset 1: one partition for the entire alignement, 13 paritions for each PCG.
+Dataset 2: one partition for entire alignment, two paritions (rRNA and PCGs), 15 partitions (for each rRNA and PCG), 28 partitions (for each rRNA and for codon position 1 and 2), 28 partitions (for each rRNA and for codon position 1 and 3), 41 partitions (for each rRNA and for each codon position in each PCG).
+Dataset 3: one partition for the entire alignment, 13 partitions for each PCG.
+**See "Partitions" to access these files
+
+### STEP 5.2: test for nucleotide saturation
+
+### STEP 5.3: use MODELFINDER v. 1.6.12 (Kalyaanamoorthy et al., 2017) in IQTree v. 2.1.3 (Minh et al., 2020) to determine the best partitioning scheme & corresponding evolutionary models to use in a Maximum Likelihood analysis.
+We chose the new model selection procedure (− m MF + MERGE), which additionally implements the FreeRate heterogeneity model inferring the site rates directly from the data instead of being drawn from a gamma distribution (Soubrier et al., 2012). 
+The top 30% partition schemes were checked using the relaxed clustering algorithm (− rcluster 30), as described in Lanfear et al. (2014). 
+```
+#!/bin/bash
+module load app/IQTREE/1.6.12
+iqtree
+datadir=./3_ML
+for i in $datadir/*.nex
+	-s "$i"
+	-spp $datadir/13PCGs_NT 
+	-m MF+MERGE 
+	-rcluster 30 
+	-AICc
+	-nt AUTO
+	--safe
+done
+
+#!/bin/bash
+module load app/IQTREE/1.6.12
+iqtree
+datadir=./3_ML
+for i in $datadir/*.nex
+	-s "$i"
+	-spp $datadir/13PCGs_rRNAs_NT 
+	-m MF+MERGE 
+	-rcluster 30 
+	-AICc
+	-nt AUTO
+	--safe
+done
+
+#!/bin/bash
+module load app/IQTREE/1.6.12
+iqtree
+datadir=./3_ML
+for i in $datadir/*.nex
+	-s "$i"
+	-spp $datadir/13PCGs_AA
+	-m MF+MERGE 
+	-rcluster 30 
+	-AICc
+	-nt AUTO
+	--safe
+done
+```
+### STEP 5.4: Use MODELFINDER in IQTree to determine the best partitioning scheme & corresponding evolutionary models to use in BI analyses
+Use mset mrbayes to restrict the results to models supported by MrBayes.
+```
+#!/bin/bash
+module load app/IQTREE/1.6.12
+iqtree
+datadir=./4_BI
+for i in $datadir/*.nex
+	-s "$i"
+	-spp $datadir/13PCGs_NT 
+	-m MF+MERGE 
+	-rcluster 30 
+	-AICc
+	-mset mrbayes
+	-nt AUTO
+	--safe
+done
+
+#!/bin/bash
+module load app/IQTREE/1.6.12
+iqtree
+datadir=./4_BI
+for i in $datadir/*.nex
+	-s "$i"
+	-spp $datadir/13PCGs_rRNAs_NT 
+	-m MF+MERGE 
+	-rcluster 30 
+	-AICc
+	-mset mrbayes
+	-nt AUTO
+	--safe
+done
+
+#!/bin/bash
+module load app/IQTREE/1.6.12
+iqtree
+datadir=./4_BI
+for i in $datadir/*.nex
+	-s "$i"
+	-spp $datadir/13PCGs_AA
+	-m MF+MERGE 
+	-rcluster 30 
+	-AICc
+	-mset mrbayes
+	-nt AUTO
+	--safe
+done
+```
+### STEP 5.5: evaluate the nucleotide substitution values and AICc to select the best partitioning scheme.
+The initial partitioning scheme with the lowest AIC and highest concordance factor (straight line graph) should be the most accurate.
 
 ## STEP 6: Phylogenetic reconstructions 
+
+### STEP 6.1: use the best-fitting partitioning scheme to construct a ML tree
+```
+#!/bin/bash
+module load app/IQTREE/1.6.12
+iqtree
+datadir=./3_ML
+	-s $datadir/13PCGs_rRNAs_NT
+	-spp $datadir/12_3_NT.nex.best_scheme.nex 
+	-alrt 1000 
+	-bb 1000
+	-nt AUTO
+	--safe
+done
+
+#!/bin/bash
+module load app/IQTREE/1.6.12
+iqtree
+datadir=./3_ML
+	-s $datadir/13PCGs_AA 
+	-spp $datadir/genes_AA.nex.best_scheme.nex 
+	-alrt 1000 
+	-bb 1000
+	-nt AUTO
+	--safe
+done
+```
+
+### STEP 6.2: BI tree reconstructio n
+
+### STEP 6.3: constructing the consensus tree
+
+Open the nex.treefile from the ML analysis in Figtree and root it at the outgroup. Save the tree (with bootstrap values) in newick format.
+Navigate the the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and make a new project.
+Import the newick file.
+Adjust size and layout and select bootstrap values.
+Import annotations. We used the following:
+
+#### Family groups
+```
+## style 1	leaf_name	text=mammal,color=darkgreen,textorientation=vertical,linewidth=4,fontsize=16,linestyle=dashed
+## style 2-5	leaf_name	bkcolor=#BE4144,text=mammal,textorientation=vertical,linewidth=4,fontsize=16
+!grouplabel	style=2
+!op	0.8
+Chiloscyllium_griseum_NC_017882,Orectolobus_japonicus_NC_022148	bkcolor=darkgrey,text=Orectolobiformes
+Carcharhinus_brachyurus_NC_057525,Carcharhinus_leucas_NC_023522	bkcolor=#FCDABE,text=Carcharhinidae
+Sphyrna_lewini_NC_022679,Sphyrna_zygaena_NC_025778	bkcolor=#B7F1A5,text=Sphyrnidae
+Hemigaleus_microstoma_NC_029400,Hemipristis_elongata_NC_032065	bkcolor=#FF9AA2,text=Hemigaleidae
+Hemitriakis_japanica_NC_026774,Galeorhinus_galeus_ON652874	bkcolor=#B2EBF9,text=Triakidae
+Proscyllium_habereri_NC_030216	bkcolor=#FFFEC4,text=Proscyllidae
+Pseudotriakis_microdon_NC_022735	bkcolor=#F9D2EF,text=Pseudotriakidae
+Cephaloscyllium_umbratile_NC_029399,Poroderma_pantherinum_NC_043830	bkcolor=#C6B7F1,text=Scyliorhinidae
+Alopias_pelagicus_NC_022822, Lamna_ditropis_NC_024269	bkcolor=lightgrey,text=Lamniformes
+```
+#### Mustelus genus reproductive mode
+```
+!grouplabel	style=1
+!op	0.8
+Mustelus_asterias_ON652873,Triakis_megalopterus_ON075075	text=aplacental-spotted,color=#0033CC,textorientation=horizontal,linewidth=4,fontsize=14,linestyle=dashed
+Mustelus_griseus_NC_023527,Mustelus_mustelus_NC_039629	text=placental-non-spotted,color=#3399FF,textorientation=horizontal,linewidth=4,fontsize=14 
+```
+#### Bootstrap style
+```
+!bootstrapValueStyle	show=2,style=numeric,color=darkred,place=2,size=12
+```
+#### Marking our sequences
+```
+Mustelus_asterias_ON652873	star,red	
+Mustelus_palumbes_ON075076	star,red
+Triakis_megalopterus_ON075075	star,red
+Mustelus_mosis_ON075077		star,red
+Galeorhinus_galeus_ON652874	star,red
+```
