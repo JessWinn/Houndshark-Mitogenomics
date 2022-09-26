@@ -1,0 +1,4 @@
+#NEXUS	
+begin sets;	
+ charset all	=1-11340;
+end;	

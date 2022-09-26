@@ -1,0 +1,5 @@
+#NEXUS	
+begin sets;	
+ charset rRNA	=1-2531;
+ charset PCGs	=2532-13871;
+end;	

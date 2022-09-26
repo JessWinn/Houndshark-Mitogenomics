@@ -1,0 +1,16 @@
+#NEXUS	
+begin sets;	
+ charset ND1	=1-972;
+ charset ND2	=973-2013;
+ charset COI	=2014-3564;
+ charset COII	=3565-4254;
+ charset ATP8	=4255-4419;
+ charset ATP6	=4420-5058;
+ charset COIII	=5059-5841;
+ charset ND3	=5842-6189;
+ charset ND4L	=6190-6483;
+ charset ND4	=6484-7860;
+ charset ND5	=7861-9684;
+ charset ND6	=9685-10197;
+ charset CYTB	=10198-11340;
+end;
