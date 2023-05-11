@@ -1,21 +1,18 @@
 # Bioinformatics pipeline of Winn et al. (2022) - Triakid Mitophlyogenomics
-***[Simo: I am struggling to follow your workflow. May you please name your scripts appropriately i.e STEP-1_XXXX, STEP-2_XXX?]***
 
 ## STEP 1: Quality Control of Ion GeneStudio™ S5 data
 
-***[Simo: How was quality control carried out? Provide a brief description of how the (1) sequence quality was checked, (2) low quality bases were trimmed and (3) adapters contamination was checked and removed.]***
-
-1. Check quality of the sequence in FastQC (https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
+1. Check sequence quality in FastQC (http://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
 2. Trim adaptors and poor-quality bases (phred score below 16) and remove reads shorter than 25 base pairs (bp) with Torrent Suite Software 5.16.
 
 ## STEP 2: Mitogenome assemblies  
 
-***[Simo: Please add a guideline for the graphical front end software and code for command line interphase software for the different assembly approaches you used]***
-
 ### STEP 2.1: reference-based assembly
-Align raw reads to the Mustelus mustelus mitogenome (NC_039629.1) using the Geneious read mapper with medium sensitivity settings and five iterations in Geneious Prime (version 2019.1.3).
+
+Align raw reads to the _Mustelus mustelus_ mitogenome (NC_039629.1) using the Geneious read mapper with medium sensitivity settings and five iterations in Geneious Prime (version 2019.1.3).
 
 ### STEP 2.2: baited assembly
+
 1. Extract reads that mapped to the reference genome in bam format.
 2. Feed the reads into a de novo pipeline in SPAdes version 3.15 with the input set for unpaired Ion Torrent reads with 8 threads, kmers 21,33,55,77,99,127, the careful option to reduce the number of mismatches and short indels and all other parameters left as default.
 EXAMPLE - Mustelus palumbes
@@ -32,6 +29,7 @@ spades.py \
 	-o $work/Mpa \
 ```
 ### STEP 2.3: de novo assembly
+
 Directly map raw reads (bam format) de novo.
 EXAMPLE - Mustelus palumbes
 ```
@@ -46,26 +44,24 @@ spades.py \
 	--careful \
 	-o $work/Mpa \
 ```
-STEP 2.4: Assembly comparison
+### STEP 2.4: Assembly comparison
+
 1. Align the three assemblies to each other using the Geneious alignment tool with default parameters. 
 2. Check each alignment for discrepancies on  Geneious and ediit maually to obtain the final genome sequence.
 
 ## STEP 3: Mitogenome annotations
 
-***[Simo: Please add a guideline for the graphical front end software and code for command line interphase software for the different annotation approaches you used]***
-
 1. Annotate protein coding genes (PCGs), ribosomal (r)RNA and transfer (t)RNA genes using MitoAnnotator in MitoFish version 3.72 (Iwasaki et al., 2013; Sato et al., 2018). 
-2. Input the gene features file from MitoAnnotator into Sequence Manipulation Suite 2 (Stothard, 2000) (set to Table 2 - vertebrate mitochondrial DNA) to check that the reading frame is correct for each PCG (no internal stop codons). 
-3. Check the annotated sequences in Geneious to ensure completeness and to manually count overlapping regions and intergenic spaces between PCGs, rRNAs, tRNAs, and non-coding regions. 
+2. Input the gene feature file from MitoAnnotator into Sequence Manipulation Suite 2 (Stothard, 2000) (set to Table 2 - vertebrate mitochondrial DNA) to check that the reading frame is correct for each PCG (no internal stop codons). 
+3. Follow the guidelines for submission to GenBank using Bankit (https://www.ncbi.nlm.nih.gov/WebSub/). After submission, download and save the GenBank files in this folder and import them into Geneious (version 2019.1.3).
+3. Check the annotated sequences in Geneious to ensure completeness and to manually count overlapping regions and intergenic spaces between PCGs, rRNAs, tRNAs, and non-coding regions.
 4. Calculate A+T and G+T content and relative synonymous codon usage (RSCU) of PCGs in DAMBE v. 7.0.35 (Xia, 2001). Base composition skewness formula: AT-skew = [A-T]/[A + T] and GC-skew = [G-C]/[G + C] (Perna and Kocher, 1995). 
-5. Predict tRNA secondary structure using the generalized vertebrate mitochondrial tRNA settings in ARWEN v. 1.2.3 (Björn Canbäck Bioinformatics) (Laslett and Canbäck, 2008) and the tRNAscanSE webserver v. 2.0 (http://lowelab.ucsc.edu/cgi-bin/tRNAscan-SE2.cgi) (Lowe and Chan, 2016).
-6. Characterise control region repetitive regions using the “Tandem Repeat Finder” webserver (https://tandem.bu.edu/trf/trf.html) (Benson, 1999) maintaining default settings. 
-7. Construct circular annotated mitogenome visuals using CGView Server v. 1.0 (Stothard and Wishart, 2005). 
-8. Deposit the annotated mitochondrial genomes on the GenBank repository under the accession numbers ON075075, ON075076, ON075077, ON652873, and ON652874.
+5. Make graphs for nucleotide composition and RSCU in R (see scripts in relevant folders).
+6. Predict tRNA secondary structure using the generalized vertebrate mitochondrial tRNA settings in ARWEN v. 1.2.3 (Björn Canbäck Bioinformatics) (Laslett and Canbäck, 2008) and the tRNAscanSE webserver v. 2.0 (http://lowelab.ucsc.edu/cgi-bin/tRNAscan-SE2.cgi) (Lowe and Chan, 2016).
+7. Characterise control region repetitive regions using the “Tandem Repeat Finder” webserver (https://tandem.bu.edu/trf/trf.html) (Benson, 1999) maintaining default settings.
+8. Download the graphic produced by MitoAnnotator and save the files as a png. Edit and enlarge gene names and incude species-specific images, gene numberd and total length in the center.
 
 ## STEP 4: Sequence alignments and concatenation
-
-***[Simo: This is my workflow for the data I gathered. The objective here is too streamline the workflow and make it reproducible. You will need to edit accordingly for your dataset. I wrote how I did things from my side.]***
 
 ### STEP 4.1: Ingroup and outgroup mitogenome retrieval from GenBank 
 First, compile a list of mitochondrial genomes of the order Carcharhiniformes from Kousteni *et al*. (2021) and Wang *et al*. (2022), which include additional outgroup representatives from the orders Lamniformes and Orectolobiformes, and save the the text file as `kousteni-wang_mitogenomes_genbank.list`. Second, use the file `kousteni-wang_mitogenomes_genebak.list` to retrieve records from GenBank using [Batch Entrez](https://www.ncbi.nlm.nih.gov/sites/batchentrez) to download the entire mitogenome records in GenBank (full) format. Last, save the file as 'kousteni-wang.gb' in a folder named `1_data´, already containing newly assembled mitogenomes also in GenBank (full) format.
