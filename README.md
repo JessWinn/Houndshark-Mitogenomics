@@ -9,7 +9,7 @@
 
 ### STEP 2.1: reference-based assembly
 
-Align raw reads to the _Mustelus mustelus_ mitogenome (NC_039629.1) using the Geneious read mapper with medium sensitivity settings and five iterations in Geneious Prime (version 2019.1.3).
+1. Align raw reads to the _Mustelus mustelus_ mitogenome (NC_039629.1) using the Geneious read mapper with medium sensitivity settings and five iterations in Geneious Prime (version 2019.1.3).
 
 ### STEP 2.2: baited assembly
 
@@ -28,6 +28,7 @@ spades.py \
 	--careful \
 	-o $work/Mpa \
 ```
+
 ### STEP 2.3: de novo assembly
 
 Directly map raw reads (bam format) de novo.
@@ -44,6 +45,7 @@ spades.py \
 	--careful \
 	-o $work/Mpa \
 ```
+
 ### STEP 2.4: Assembly comparison
 
 1. Align the three assemblies to each other using the Geneious alignment tool with default parameters. 
@@ -64,19 +66,22 @@ spades.py \
 ## STEP 4: Sequence alignments and concatenation
 
 ### STEP 4.1: Ingroup and outgroup mitogenome retrieval from GenBank 
-First, compile a list of mitochondrial genomes of the order Carcharhiniformes from Kousteni *et al*. (2021) and Wang *et al*. (2022), which include additional outgroup representatives from the orders Lamniformes and Orectolobiformes, and save the the text file as `kousteni-wang_mitogenomes_genbank.list`. Second, use the file `kousteni-wang_mitogenomes_genebak.list` to retrieve records from GenBank using [Batch Entrez](https://www.ncbi.nlm.nih.gov/sites/batchentrez) to download the entire mitogenome records in GenBank (full) format. Last, save the file as 'kousteni-wang.gb' in a folder named `1_data´, already containing newly assembled mitogenomes also in GenBank (full) format.
+
+1. Save the five newly assembled houndshark mitogenomes in Genbank (full) format in 1a_Data.
+2. Compile a list of mitogenome accession numbers from Wang et al. 2022 and Kousteni et al. 2021 as well as four outgroups each from the Lamniform and Orectolobiform orders and save the text file as kousteni-wang_mitogenomes_genbank.list.
+3. Use kousteni-wang_mitogenomes_genbank.list in a Batch Entrez(https://www.ncbi.nlm.nih.gov/sites/batchentrez) search to retrieve and download the mitogenome records in Genbank (full) format as a file named kousteni-wang.gb.
+4. Merge kousteni-wang.gb and the five newly assembled mitogenomes:
+cat *.gb > winn_2022.gb.
 
 ### STEP 4.2: Gene region extrations
-First, within the `1_data´ folder, merge all the newely assembled mitogenome .gb files with those obtained from GenBank in the the preceeding step.
-```
-cat *.gb > winn_2022.gb
-```
-Second, extract rNRA and CDS DNA sequences from Genbank file using [GBSEQEXTRACTOR v.0.0.4](https://github.com/linzhi2013/gbseqextractor).
+
+1. Extract rRNA and CDS DNA sequences from the Genbank file using GBSEQEXTRACTOR v0.04 (https://github.com/linzhi2013/gbseqextractor).
 ```
 gbseqextractor -f winn_2022.gb -prefix winn_2022 -types rRNA -s # output file ´winn_2022.rrna.fasta´
 gbseqextractor -f winn_2022.gb -prefix winn_2022 -types CDS -s	# output file `winn_2022.cds.fasta´
 ```
-Third, merge the rNRA and CDS fasta files.
+
+2. Merge the rRNA and CDS fasta files.
 ```
 cat winn_2022.rrna.fasta winn_2022.cds.fasta > winn_2022.cds-rrna.fasta
 	# Using Notepad+++, edit the file ´winn_2022.cds-rrna.fasta´ to standardize gene names.
@@ -85,7 +90,8 @@ cat winn_2022.rrna.fasta winn_2022.cds.fasta > winn_2022.cds-rrna.fasta
 	# 'ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA'.
 	# Save the edited file as `winn_2022.cds-rrna.std.fasta´.
 ```
-Finally, extract individual gene sequences (.fa) from `winn_2022.cds-rrna.std.fasta` using the custom script `maduna2022-gene-extractions.sh`:
+
+3. Extract individual gene sequences (.fa) from winn_2022.cds-rrna.std.fasta using the custom script maduna2022-gene-extractions.sh
 ```
 #!/bin/bash
 
@@ -103,22 +109,16 @@ mv 'ND4;.fa' ND4.fa
 for f in *.fa
 	do
 		sed -i 's/;/_/g' $f
-	done 
+	done
 ```
 
 ### STEP 4.3: Multiple Sequence Alignment
-Align protein coding genes using MACSE2 and rRNA genes using MAFFT (Q-INS-i algorithm).
-First, we must create a new folder called `2_MSA´ and move .fa files of 13 PCGs to a subfolder called `13PCGs´ and the 2 rRNA genes to a subfolder called  `2RNAs´.
+
+1. Create a new folder called 2a_MACSE2. Download the latest version of MACSE and save 'macse_v2.06.jar' at present, in the folder.
+2. Save the extracted protein coding (PCG) genes from 1b_GeneExtract, first checking that they are in the correct orientation in Geneious 2019.2.1, as .fasta files in 2a_MACSE2.
+3. Align the PCGs using the for loop script maduna2022-13pcgs-msa.sh.
 ```
-mkdir 13PCGs 2RNAs
-mv *rRNA*.fa 2RNAs/
-ls 2RNAs/*.fa | wc -l # folder should have 2 .fa files
-mv *.fa 13PCGs/
-ls 13PCGs/*.fa | wc -l # folder should have 13 .fa files
-```
-Second, download the the most recent release of [MACSE](https://bioweb.supagro.inra.fr/macse/) and copy the .jar file, 'macse_v2.06.jar' at present, into the ´13PCGs/´. We checked that sequecens were in the correct orientation and made adjustments accordingly in MEGA. Then we aligned the protein coding genes using the for loop script `maduna2022-13pcgs-msa.sh`.
-```
-datadir=./13PCGs
+datadir=./2a_MACSE2
 for i in $datadir/*.fa
 do		
 	java -jar -Xmx600m macse_v2.06.jar -prog alignSequences -seq "$i" -gc_def 2		
@@ -126,21 +126,37 @@ done
 	# alignSequences: aligns nucleotide (NT) coding sequences using their amino acid (AA) translations.
 	# gc_def: specify the genetic code 2 (The_Vertebrate_Mitochondrial_Code) or change accordingly for your study taxa.
 ```
-Third, we opted to alig the rRNA genes using the online version of [MAFFT (version 7)](https://mafft.cbrc.jp/alignment/server/) using the Q-INS-i iterative refinement method, adjusting the direction according to the first sequence confirmed to be in the 5' -> 3' direction.
-Fourth, we visually inspect and manually edit alignments using MEGA X. We removed terminal stop codons from the PCG alignments and trimmed alignements to a sequence lenght is divisible by 3. When needed, used BMGE (Block Mapping and Gathering with Entropy) to remove any remaining ambiguously aligned sites. For the RNAs, we used BMGE to remove ambiguously aligned sites.
-Finally, before mitophylogenomic analysis, we produced three concatenated mitogenomic datasets from (i) the aligned individual PCGs datasets (Dataset 1: 13PCGs_NT dataset), (ii) the 13 PCGs plus the two rRNA genes (Dataset 2: 13PCGs_rRNAs_NT dataset) with the R package concatipede v1.0.1 (Vecchi and Bruneaux, 2021), and (iii) we derived the third mitogenomic dataset by translating the 13PCGs_NT dataset in MEGA (Dataset 3: 13PCGs_AA dataset). 
+4. Align the rRNA genes using the online version of MAFFT (version 7, https://mafft.cbrc.jp/alignment/server/) using the Q-INS-i iterative refinement method, adjusting the direction according to the first sequences confirmed to be in the 5' to 3' direction.
+5. Open all alignments from 2a_MACSE in Geneious 2019.2.1 and remove stop codons and ensure each alignment has a length divisible by 3.
+6. Change the translation setting to Vertebrate Mitochondrial (Table 2) and check for internal stop codons. 
+7. If there are remaining ambiguosly aligned sites, remove them with BMGE version 1.12_1 maintaining default settings through the NGPhylogeny.fr webserver (https://ngphylogeny.fr/).
+8. Clean both rRNA alignments with BMGE.
+9. Export the edited alignments into the folder 2c_CleanEdit
+10. Concatenate the 13 PCGs in Geneious 2019.2.1 and save as 13PCGs_NT (Dataset 1) in fasta, nexus and phyllip format.
+11. Concatenate the 13 PCGs and 2 rRNA genes in Geneious and save as 13PCGs_2rRNAs_NT (Dataset 2) in fasta, nexus and phyllip format.
+12. Translate 13PCGs_NT and save as 13PCGs_AA (Dataset 3) in fasta, nexus and phyllip format.
+13. Make length summaries with the length and alignment locations of each alignment to use for the partition files.
 
 ## STEP 5: Substitution saturation and data partitioning schemes 
 
 ### STEP 5.1: construct 10 partition nexus files, two for dataset 1, six for dataset 2 and two for dataset 3.
+
 Dataset 1: one partition for the entire alignement, 13 paritions for each PCG.
 Dataset 2: one partition for entire alignment, two paritions (rRNA and PCGs), 15 partitions (for each rRNA and PCG), 28 partitions (for each rRNA and for codon position 1 and 2), 28 partitions (for each rRNA and for codon position 1 and 3), 41 partitions (for each rRNA and for each codon position in each PCG).
 Dataset 3: one partition for the entire alignment, 13 partitions for each PCG.
-**See "Partitions" to access these files
+***[See "Partitions" to access these files]
 
 ### STEP 5.2: test for nucleotide saturation
 
+1. Perform two-tailed tests to examine the degree of nucleotide substitution saturation (Xia et al., 2003) for each gene as well as each codon position of the 13 PCGs, 13PCGs_NT and 13PCGs_rRNAs_NT.
+Take into account the proportion of invariant sites as recommended by Xia and Lemey (2009) in DAMBE v.7.2.141 (Xia, 2018). 
+2. Visually inspect substitution saturation by plotting the number of transitions (s) and transversions (v) versus divergence.
+Divergence is based on genetic distances derived from the Kimura two-parameter (K2P or K80) substitution model (Kimura, 1980). 
+The K80 substitution model accommodates transition/transversion rate. 
+Bias and the ‘K80 distance’ is expected to increase linearly with divergence time. 
+
 ### STEP 5.3: use MODELFINDER v. 1.6.12 (Kalyaanamoorthy et al., 2017) in IQTree v. 2.1.3 (Minh et al., 2020) to determine the best partitioning scheme & corresponding evolutionary models to use in a Maximum Likelihood analysis.
+
 We chose the new model selection procedure (− m MF + MERGE), which additionally implements the FreeRate heterogeneity model inferring the site rates directly from the data instead of being drawn from a gamma distribution (Soubrier et al., 2012). 
 The top 30% partition schemes were checked using the relaxed clustering algorithm (− rcluster 30), as described in Lanfear et al. (2014). 
 ```
