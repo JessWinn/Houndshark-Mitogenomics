@@ -94,18 +94,14 @@ cat winn_2022.rrna.fasta winn_2022.cds.fasta > winn_2022.cds-rrna.fasta
 3. Extract individual gene sequences (.fa) from winn_2022.cds-rrna.std.fasta using the custom script maduna2022-gene-extractions.sh
 ```
 #!/bin/bash
-
 GENE=('ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4;' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA')
-
 for g in "${GENE[@]}"
 	do
 		awk '{ if ((NR>1)&&($0~/^>/)) { printf("\n%s", $0); } else if (NR==1) \
 		{ printf("%s", $0); } else { printf("\t%s", $0); } }' \
 		winn_2022.cds-rrna.std.fasta | grep -F  $g - | tr "\t" "\n" > "${g}".fa
 	done
-
 mv 'ND4;.fa' ND4.fa
-
 for f in *.fa
 	do
 		sed -i 's/;/_/g' $f
@@ -118,6 +114,7 @@ for f in *.fa
 2. Save the extracted protein coding (PCG) genes from 1b_GeneExtract, first checking that they are in the correct orientation in Geneious 2019.2.1, as .fasta files in 2a_MACSE2.
 3. Align the PCGs using the for loop script maduna2022-13pcgs-msa.sh.
 ```
+#!/bin/bash
 datadir=./2a_MACSE2
 for i in $datadir/*.fa
 do		
@@ -142,9 +139,9 @@ done
 ### STEP 5.1: construct 10 partition nexus files, two for dataset 1, six for dataset 2 and two for dataset 3.
 
 Dataset 1: one partition for the entire alignement, 13 paritions for each PCG.
-Dataset 2: one partition for entire alignment, two paritions (rRNA and PCGs), 15 partitions (for each rRNA and PCG), 28 partitions (for each rRNA and for codon position 1 and 2), 28 partitions (for each rRNA and for codon position 1 and 3), 41 partitions (for each rRNA and for each codon position in each PCG).
+Dataset 2: one partition for the entire alignment, two paritions (rRNA and PCGs), 15 partitions (for each rRNA and PCG), 28 partitions (for each rRNA and for codon position 1 and 2), 28 partitions (for each rRNA and for codon position 1 and 3), 41 partitions (for each rRNA and for each codon position in each PCG).
 Dataset 3: one partition for the entire alignment, 13 partitions for each PCG.
-***[See "Partitions" to access these files]
+***[See "Partitions" to access these files.]
 
 ### STEP 5.2: test for nucleotide saturation
 
@@ -157,136 +154,301 @@ Bias and the ‘K80 distance’ is expected to increase linearly with divergence
 
 ### STEP 5.3: use MODELFINDER v. 1.6.12 (Kalyaanamoorthy et al., 2017) in IQTree v. 2.1.3 (Minh et al., 2020) to determine the best partitioning scheme & corresponding evolutionary models to use in a Maximum Likelihood analysis.
 
-We chose the new model selection procedure (− m MF + MERGE), which additionally implements the FreeRate heterogeneity model inferring the site rates directly from the data instead of being drawn from a gamma distribution (Soubrier et al., 2012). 
+Apply the new model selection procedure (-m MF+MERGE)  which additionally implements the FreeRate heterogeneity model, inferring the site rates directly from the data instead of being drawn from a gamma distribution (-cmax 20; Soubrier et al., 2012).
 The top 30% partition schemes were checked using the relaxed clustering algorithm (− rcluster 30), as described in Lanfear et al. (2014). 
+The maximum number of rate categories, cmax, is set to 20 since it is likely to observe more rate variations for alignments with many sequences. 
+3 CPU cores, T, are used to decrease computational burden.
+
+1. 13 PCGs_NT
 ```
 #!/bin/bash
-module load app/IQTREE/1.6.12
-iqtree
-datadir=./3_ML
-for i in $datadir/*.nex
-	-s "$i"
-	-spp $datadir/13PCGs_NT 
-	-m MF+MERGE 
-	-rcluster 30 
-	-AICc
-	-nt AUTO
-	--safe
-done
-
-#!/bin/bash
-module load app/IQTREE/1.6.12
-iqtree
-datadir=./3_ML
-for i in $datadir/*.nex
-	-s "$i"
-	-spp $datadir/13PCGs_rRNAs_NT 
-	-m MF+MERGE 
-	-rcluster 30 
-	-AICc
-	-nt AUTO
-	--safe
-done
-
-#!/bin/bash
-module load app/IQTREE/1.6.12
-iqtree
-datadir=./3_ML
-for i in $datadir/*.nex
-	-s "$i"
-	-spp $datadir/13PCGs_AA
-	-m MF+MERGE 
-	-rcluster 30 
-	-AICc
-	-nt AUTO
-	--safe
-done
+module load app/IQTREE/2.1.3
+cd *./13PCGs
+iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS1/PS1.txt -pre PS1/PS1_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS5/PS5.txt -pre PS5/PS5_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
 ```
+2. 13PCGs_2rRNAs_NT
+```
+#!/bin/bash
+module load app/IQTREE/2.1.3
+cd *./13PCGs_2rRNAs
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS1/PS1.txt -pre PS1/PS1_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS2/PS2.txt -pre PS2/PS2_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS3/PS3.txt -pre PS3/PS3_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS4/PS4.txt -pre PS4/PS4_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS5/PS5.txt -pre PS5/PS5_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS6/PS6.txt -pre PS6/PS6_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS7/PS7.txt -pre PS7/PS7_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS8/PS8.txt -pre PS8/PS8_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+```
+3. 13PCGs_AA
+```
+#!/bin/bash
+module load app/IQTREE/2.1.3
+cd *./13PCGs
+iqtree2 -s 13PCGs_AA.fasta -st AA -p PS1/PS1AA.txt -pre PS1/PS1AA_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_AA.fasta -st AA -p PS5/PS5AA.txt -pre PS5/PS5AA_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+```
+
+***[Repeat the above using the Bayesian Information Critereon (BIC).]
+
 ### STEP 5.4: Use MODELFINDER in IQTree to determine the best partitioning scheme & corresponding evolutionary models to use in BI analyses
-Use mset mrbayes to restrict the results to models supported by MrBayes.
+
+Apply secondary model selection for the best-fitting partitioning identified by ModelFinder in Step 5.4 under the FreeRate heterogeneity model to select the next best model for Bayesian inference.
+Rerun ModelFinder with options: -m TESTONLY -mset mrbayes to restrict the results to models supported by MrBayes.
+
+1. 13PCGs_NT
 ```
 #!/bin/bash
-module load app/IQTREE/1.6.12
-iqtree
-datadir=./4_BI
-for i in $datadir/*.nex
-	-s "$i"
-	-spp $datadir/13PCGs_NT 
-	-m MF+MERGE 
-	-rcluster 30 
-	-AICc
-	-mset mrbayes
-	-nt AUTO
-	--safe
-done
-
-#!/bin/bash
-module load app/IQTREE/1.6.12
-iqtree
-datadir=./4_BI
-for i in $datadir/*.nex
-	-s "$i"
-	-spp $datadir/13PCGs_rRNAs_NT 
-	-m MF+MERGE 
-	-rcluster 30 
-	-AICc
-	-mset mrbayes
-	-nt AUTO
-	--safe
-done
-
-#!/bin/bash
-module load app/IQTREE/1.6.12
-iqtree
-datadir=./4_BI
-for i in $datadir/*.nex
-	-s "$i"
-	-spp $datadir/13PCGs_AA
-	-m MF+MERGE 
-	-rcluster 30 
-	-AICc
-	-mset mrbayes
-	-nt AUTO
-	--safe
-done
+module load app/IQTREE/2.1.3
+cd *./13PCGs
+iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS1/PS1_run01_mf.best_scheme.nex -pre PS1/PS1_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS5/PS5_run01_mf.best_scheme.nex -pre PS5/PS5_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
 ```
-### STEP 5.5: evaluate the nucleotide substitution values and AICc to select the best partitioning scheme.
+2. 13PCGs_2rRNAs
+```
+#!/bin/bash
+module load app/IQTREE/2.1.3
+cd *./13PCGs_2rRNAs
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS1/PS1_run01_mf.best_scheme.nex -pre PS1/PS1_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS2/PS2_run01_mf.best_scheme.nex -pre PS2/PS2_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS3/PS3_run01_mf.best_scheme.nex -pre PS3/PS3_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS4/PS4_run01_mf.best_scheme.nex -pre PS4/PS4_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS5/PS5_run01_mf.best_scheme.nex -pre PS5/PS5_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS6/PS6_run01_mf.best_scheme.nex -pre PS6/PS6_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS7/PS7_run01_mf.best_scheme.nex -pre PS7/PS7_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS8/PS8_run01_mf.best_scheme.nex -pre PS8/PS8_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+```
+3. 13PCGs_AA
+```
+#!/bin/bash
+module load app/IQTREE/2.1.3
+cd *./13PCGs
+iqtree2 -s 13PCGs_NT.fasta -st AA -p PS1/PS1AA_run01_mf.best_scheme.nex -pre PS1/PS1AA_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_NT.fasta -st AA -p PS5/PS5AA_run01_mf.best_scheme.nex -pre PS5/PS5AA_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+```
+
+### STEP 5.5: evaluate the nucleotide substitution saturation values and likelihood statistics to select the best partitioning scheme.
+
 The initial partitioning scheme with the lowest AIC and highest concordance factor (straight line graph) should be the most accurate.
 
 ## STEP 6: Phylogenetic reconstructions 
 
-### STEP 6.1: use the best-fitting partitioning scheme to construct a ML tree
+### STEP 6.1: construct ML trees for each partitioning scheme
+
+Use substitution models indicated above in best_model.nex files for each partitioning scheme to construct Maximum Likelihood phylogenies.
+Use the Nearest Neighbor Interchange (NNI) approach to search for tree topology.
+Compute branch supports with 1000 replicates of the Shimodaira-Hasegawa approximate likelihood-ratio test (SH-aLRT; Anisimova and Gascuel, 2006) and the ultrafast bootstrapping (UFBoot2) approach (Hoang et al., 2018).
+
+1. 13PCGs_NT
 ```
 #!/bin/bash
 module load app/IQTREE/1.6.12
-iqtree
-datadir=./3_ML
-	-s $datadir/13PCGs_rRNAs_NT
-	-spp $datadir/12_3_NT.nex.best_scheme.nex 
-	-alrt 1000 
-	-bb 1000
-	-nt AUTO
-	--safe
-done
-
+cd ./13PCGs
+iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS1/PS1_run01_mf.best_model.nex -pre PS1/PS1_run02_ml -T 3 -B 1000 -alrt 1000
+iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS5/PS5_run01_mf.best_model.nex -pre PS5/PS5_run02_ml -T 3 -B 1000 -alrt 1000
+```
+2. 13PCGs_2rRNAs_NT
+```
 #!/bin/bash
 module load app/IQTREE/1.6.12
-iqtree
-datadir=./3_ML
-	-s $datadir/13PCGs_AA 
-	-spp $datadir/genes_AA.nex.best_scheme.nex 
-	-alrt 1000 
-	-bb 1000
-	-nt AUTO
-	--safe
-done
+cd ./13PCGs_2rRNAs
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS1/PS1_run01_mf.best_model.nex -pre PS1/PS1_run02_ml -T 3 -B 1000 -alrt 1000
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS2/PS2_run01_mf.best_model.nex -pre PS2/PS2_run02_ml -T 3 -B 1000 -alrt 1000
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS3/PS3_run01_mf.best_model.nex -pre PS3/PS3_run02_ml -T 3 -B 1000 -alrt 1000
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS4/PS4_run01_mf.best_model.nex -pre PS4/PS4_run02_ml -T 3 -B 1000 -alrt 1000
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS5/PS5_run01_mf.best_model.nex -pre PS5/PS5_run02_ml -T 3 -B 1000 -alrt 1000
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS6/PS6_run01_mf.best_model.nex -pre PS6/PS6_run02_ml -T 3 -B 1000 -alrt 1000
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS7/PS7_run01_mf.best_model.nex -pre PS7/PS7_run02_ml -T 3 -B 1000 -alrt 1000
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS8/PS8_run01_mf.best_model.nex -pre PS8/PS8_run02_ml -T 3 -B 1000 -alrt 1000
+```
+3. 13PCGs_AA
+```
+#!/bin/bash
+module load app/IQTREE/1.6.12
+cd ./13PCGs
+iqtree2 -s 13PCGs_AA.fasta -st AA -p PS1/PS1AA_run01_mf.best_model.nex -pre PS1/PS1AA_run02_ml -T 3 -B 1000 -alrt 1000
+iqtree2 -s 13PCGs_AA.fasta -st AA -p PS5/PS5AA_run01_mf.best_model.nex -pre PS5/PS5AA_run02_ml -T 3 -B 1000 -alrt 1000
 ```
 
-### STEP 6.2: BI tree reconstructio n
+### STEP 6.2: BI tree reconstruction
 
-### STEP 6.3: constructing the consensus tree
+1. Perform Bayesian Inference analysis using the Cyberinfrastructure for Phylogenetic Research (CIPRES) Science Gateway portal v. 3.3 (www.phylo.org) at the San Diego Supercomputer Center (Miller et al., 2010).
+Run a pair of independent searches for 5 million generations, with trees saved every 1,000 generations and the first 2,500 sampled trees of each search discarded as burn-in. 
+2. Screen the model parameter summary statistics Estimated Sample Size (ESS) and Potential Scale Reduction Factor (PSRF), where convergence occurred at ESS >200, and PSRF ~1.0. 
+```
+#!/bin/bash
+for g in *.nex
+	do
+		mb -i $g
+	done
+```
+***[Scripts to plot MrBayes log files are stores as kmisc.R, mb_plots.R - https://rdrr.io/github/kmiddleton/kmmisc/man/plot_mrb.html]
 
-Open the nex.treefile from the ML analysis in Figtree and root it at the outgroup. Save the tree (with bootstrap values) in newick format.
+### STEP 6.3: computing confordance factors
+
+Investigate topological conflict around each branch of the species tree by calculating gene and site concordance factors in IQ-Tree.
+Infer concatenation-based species trees with 1000 ultrafast bootstraps and an edge-linked partition model.
+
+1. 13PCGs_NT
+```
+#!/bin/bash
+module load app/IQTREE/1.6.12
+cd ./13PCGs
+
+# Calculate gene concordance factors (gCF).
+iqtree2 -s 13PCGs_NT.fasta -p PS1/PS1_run01_mf.best_scheme.nex --prefix PS1/PS1_run03_concat.condonpart.MF -B 1000 -T 3
+iqtree2 -s 13PCGs_NT.fasta -p PS5/PS5_run01_mf.best_scheme.nex --prefix PS5/PS5_run03_concat.condonpart.MF -B 1000 -T 3
+
+# Calculate site concordance factors (sCF) and infer the locus trees.
+iqtree2 -s 13PCGs_NT.fasta -S PS1/PS1_run01_mf.best_scheme.nex --prefix PS1/PS1_run03_loci.condonpart.MF -T 3
+iqtree2 -s 13PCGs_NT.fasta -S PS5/PS5_run01_mf.best_scheme.nex --prefix PS5/PS5_run03_loci.condonpart.MF -T 3
+
+# Compute concordance factors.
+iqtree2 -t PS1/PS1_run03_concat.condonpart.MF.treefile --gcf PS1/PS1_run03_loci.condonpart.MF.treefile -s 13PCGs_NT.fasta --scf 100 -seed 471990 --prefix PS1/PS1_run03_concord
+iqtree2 -t PS5/PS5_run03_concat.condonpart.MF.treefile --gcf PS5/PS5_run03_loci.condonpart.MF.treefile -s 13PCGs_NT.fasta --scf 100 -seed 471990 --prefix PS5/PS5_run03_concord
+```
+
+2. 13PCGs_2rRNAs_NT
+```
+#!/bin/bash
+module load app/IQTREE/1.6.12
+cd ./13PCGs_2rRNAs
+
+# Calculate gene concordance factors (gCF).
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -p PS1/PS1_run01_mf.best_scheme.nex --prefix PS1/PS1_run03_concat.condonpart.MF -B 1000 -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -p PS2/PS2_run01_mf.best_scheme.nex --prefix PS2/PS2_run03_concat.condonpart.MF -B 1000 -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -p PS3/PS3_run01_mf.best_scheme.nex --prefix PS3/PS3_run03_concat.condonpart.MF -B 1000 -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -p PS4/PS4_run01_mf.best_scheme.nex --prefix PS4/PS4_run03_concat.condonpart.MF -B 1000 -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -p PS5/PS5_run01_mf.best_scheme.nex --prefix PS5/PS5_run03_concat.condonpart.MF -B 1000 -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -p PS6/PS6_run01_mf.best_scheme.nex --prefix PS6/PS6_run03_concat.condonpart.MF -B 1000 -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -p PS7/PS7_run01_mf.best_scheme.nex --prefix PS7/PS7_run03_concat.condonpart.MF -B 1000 -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -p PS8/PS8_run01_mf.best_scheme.nex --prefix PS8/PS8_run03_concat.condonpart.MF -B 1000 -T 3
+
+# Calculate site concordance factors (sCF) and infer the locus trees.
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -S PS1/PS1_run01_mf.best_scheme.nex --prefix PS1/PS1_run03_loci.condonpart.MF -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -S PS2/PS2_run01_mf.best_scheme.nex --prefix PS2/PS2_run03_loci.condonpart.MF -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -S PS3/PS3_run01_mf.best_scheme.nex --prefix PS3/PS3_run03_loci.condonpart.MF -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -S PS4/PS4_run01_mf.best_scheme.nex --prefix PS4/PS4_run03_loci.condonpart.MF -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -S PS5/PS5_run01_mf.best_scheme.nex --prefix PS5/PS5_run03_loci.condonpart.MF -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -S PS6/PS6_run01_mf.best_scheme.nex --prefix PS6/PS6_run03_loci.condonpart.MF -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -S PS7/PS7_run01_mf.best_scheme.nex --prefix PS7/PS7_run03_loci.condonpart.MF -T 3
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -S PS8/PS8_run01_mf.best_scheme.nex --prefix PS8/PS8_run03_loci.condonpart.MF -T 3
+
+# Compute concordance factors.
+iqtree2 -t PS1/PS1_run03_concat.condonpart.MF.treefile --gcf PS1/PS1_run03_loci.condonpart.MF.treefile -s 13PCGs_2rRNAs_NT.fasta --scf 100 -seed 471990 --prefix PS1/PS1_run03_concord
+iqtree2 -t PS2/PS2_run03_concat.condonpart.MF.treefile --gcf PS2/PS2_run03_loci.condonpart.MF.treefile -s 13PCGs_2rRNAs_NT.fasta --scf 100 -seed 471990 --prefix PS2/PS2_run03_concord
+iqtree2 -t PS3/PS3_run03_concat.condonpart.MF.treefile --gcf PS3/PS3_run03_loci.condonpart.MF.treefile -s 13PCGs_2rRNAs_NT.fasta --scf 100 -seed 471990 --prefix PS3/PS3_run03_concord
+iqtree2 -t PS4/PS4_run03_concat.condonpart.MF.treefile --gcf PS4/PS4_run03_loci.condonpart.MF.treefile -s 13PCGs_2rRNAs_NT.fasta --scf 100 -seed 471990 --prefix PS4/PS4_run03_concord
+iqtree2 -t PS5/PS5_run03_concat.condonpart.MF.treefile --gcf PS5/PS5_run03_loci.condonpart.MF.treefile -s 13PCGs_2rRNAs_NT.fasta --scf 100 -seed 471990 --prefix PS5/PS5_run03_concord
+iqtree2 -t PS6/PS6_run03_concat.condonpart.MF.treefile --gcf PS6/PS6_run03_loci.condonpart.MF.treefile -s 13PCGs_2rRNAs_NT.fasta --scf 100 -seed 471990 --prefix PS6/PS6_run03_concord
+iqtree2 -t PS7/PS7_run03_concat.condonpart.MF.treefile --gcf PS7/PS7_run03_loci.condonpart.MF.treefile -s 13PCGs_2rRNAs_NT.fasta --scf 100 -seed 471990 --prefix PS7/PS7_run03_concord
+iqtree2 -t PS8/PS8_run03_concat.condonpart.MF.treefile --gcf PS8/PS8_run03_loci.condonpart.MF.treefile -s 13PCGs_2rRNAs_NT.fasta --scf 100 -seed 471990 --prefix PS8/PS8_run03_concord
+```
+
+3. 13PCGs_AA
+```
+#!/bin/bash
+module load app/IQTREE/1.6.12
+cd ./13PCGs
+
+# Calculate gene concordance factors (gCF).
+iqtree2 -s 13PCGs_AA.fasta -p PS1/PS1AA_run01_mf.best_scheme.nex --prefix PS1/PS1AA_run03_concat.condonpart.MF -B 1000 -T 3
+iqtree2 -s 13PCGs_AA.fasta -p PS5/PS5AA_run01_mf.best_scheme.nex --prefix PS5/PS5AA_run03_concat.condonpart.MF -B 1000 -T 3
+
+# Calculate site concordance factors (sCF) and infer the locus trees.
+iqtree2 -s 13PCGs_AA.fasta -S PS1/PS1AA_run01_mf.best_scheme.nex --prefix PS1/PS1AA_run03_loci.condonpart.MF -T 3
+iqtree2 -s 13PCGs_AA.fasta -S PS5/PS5AA_run01_mf.best_scheme.nex --prefix PS5/PS5AA_run03_loci.condonpart.MF -T 3
+
+# Compute concordance factors.
+iqtree2 -t PS1/PS1AA_run03_concat.condonpart.MF.treefile --gcf PS1/PS1AA_run03_loci.condonpart.MF.treefile -s 13PCGs_AA.fasta --scf 100 -seed 471990 --prefix PS1/PS1AA_run03_concord
+iqtree2 -t PS5/PS5AA_run03_concat.condonpart.MF.treefile --gcf PS5/PS5AA_run03_loci.condonpart.MF.treefile -s 13PCGs_AA.fasta --scf 100 -seed 471990 --prefix PS5/PS5AA_run03_concord
+```
+### STEP 6.4: running the approximately unbiased (AU) tree topology test.
+
+Compare the trees from the eight runs to determine significant diﬀerences with the approximately unbiased (AU) tree topology test (Shimodaira, 2002) also implemented in IQ-Tree.
+1. Save the final eight treefiles as a list in Newick format.
+2. Compute the log likelihood of the set of trees (-z).
+3. Set the number of search iterations is set to 0 (model parameters are quickly estimated from an initial parsimony tree).
+4. Run tree topology tests using the RELL approximation (Kishino et al., 1990). zb specifies the number of RELL replicates.
+5. Perform weighted KH and weighted SH tests (-zw)
+6. Conduct an approximately unbiased (AU) test (Shimodaira, 2002) (-au)
+
+```
+#!/bin/bash
+module load app/IQTREE/1.6.12
+cd ./13PCGs_2rRNAs
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -z TopoTest_PS1-PS8.treesls --prefix TopoTest_run01 -n 0 -zb 10000 -zw -au -nt AUTO
+```
+***[A tree is rejected if its p-value < 0.05 (marked with a - sign) for KH, SH and AU tests.]
+***[bp-RELL and c-ELW return posterior weights which are not p-values. The weights sum up to 1 across the trees tested.]
+
+### STEP 6.5: test the hypothesis of equal frequencies.
+
+Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and sites (sCF) supporting the two alternative topologies differ significantly as implemented in Lanfear’s R script (Minh et al., 2020) in R v.4.1.2 (R Core Team, 2021).
+
+### STEP 6.6: visualising and analysing trees
+
+1. Open all nex.treefile from the ML and BI analyses in FigTree and root at the outgroup.
+2. Align nodes and view in increasing order.
+3. Highlight the Triakidae family branches and nodes.
+4. Add bootstrap, concordance factors and posterior probability values.
+5. Save as png files and visualise.
+***[Nodes with UFBoot2 ≥ 95, PP ≥ 95 and SH-aLRT ≥ 80 were considered well supported (Minh et al., 2020b).]
+***[Nodes with sCF values below 33% and gCF values that are lower than sCF values or near zero require further attention].
+
+## STEP 7: comparing species trees to gene trees under the multispecies coalescent model.
+
+### STEP 7.1: ASTRAL
+
+1. Estimate individual gene trees for the 13 PCGs and 2 rRNAs based on the ML criterion in IQ-Tree.
+Use a greedy model selection strategy (-m MFP)and the NNI approach to search for tree topology and compute branch supports with 1000 bootstrapped replicates of the UFBoot2 approach (Hoang et al., 2018).
+
+```
+for gene in *.fas
+	do
+		iqtree2 -s $gene -st DNA -m MFP -AICc -nt AUTO -B 1000 
+	done
+```
+2. Create a combined file containing all the gene trees.`
+```
+cat *.treefile > elasmo.15gene.tre
+````
+3. Convert the treefile to Newick format in FigTree.
+4. Run the combined gene tree Newick file through ASTRAL v.5.6.3 (Zhang et al., 2018) using the default options.
+```
+java -jar astral.5.7.8.jar -i elasmo-mitophy-15G.tre -o elasmo-mitophy-15G-ASTRAL.tre
+````
+5. Collapse branches with low support using newick utilities and then run ASTRAL.
+```
+nw_ed  elasmo-mitophy-15G.tre 'i & b<=10' o > elasmo-mitophy-15G-BS10.tre
+java -jar astral.5.7.8.jar -i elasmo-mitophy-15G-BS10.tre -o elasmo-mitophy-15G-BS10-ASTRAL.tre
+```
+6. Annotate the branches of the species tree generated in step 2a.
+```
+# Full annotation
+java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15G.tre -t 2 -o elasmo-mitophy-15G-scored-t2.tre
+
+# Generate the posterior probabilities for branches of the main topology and the two alternatives which add up to three for each branch.
+java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15G.tre -t 4 -o elasmo-mitophy-15G-scored-t4.tre
+
+# Show quartet support for the main topology and the two alternative topologies.
+java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15G.tre -t 8 -o elasmo-mitophy-15G-scored-t8.tre
+
+# Test for polytomies with the method of Sayyari and Mirarab (2018), which is based on a Chi-Square test among quartet frequencies for nodes, implemented with the -t 10 command. 
+
+java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15G.tre -t `10 -o elasmo-mitophy-15G-scored-t10.tre
+```
+
+### STEP 7.2: SVDQuartets
+
+1. Create a nexus file using Dataset 2: 13PCGs_2rRNAs_NT. Use the gene partitions from partition scheme 5 (Table 4).
+2. Open the nexus file in PAUP* v4.0a 169 (Swofford, 2003).
+3. Implement the multispecies coalescent tree model with random quartet sampling of 100,000 replicates and 1,000 bootstrap replicates (https://phylosolutions.com/tutorials/svdq-qage/svdq-qage-tutorial.html).
+
+## STEP 8: constructing consensus trees
+
+Save the best supported trees above (with bootstrap values) in newick format.
 Navigate the the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and make a new project.
 Import the newick file.
 Adjust size and layout and select bootstrap values.
