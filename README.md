@@ -1,4 +1,4 @@
-# Bioinformatics pipeline of Winn et al. (2022) - Triakid Mitophlyogenomics
+# Bioinformatics pipeline of Winn et al. (2022) - Triakid Mitophylogenomics
 
 ## STEP 1: Quality Control of Ion GeneStudio™ S5 data
 
@@ -14,8 +14,8 @@
 ### STEP 2.2: baited assembly
 
 1. Extract reads that mapped to the reference genome in bam format.
-2. Feed the reads into a de novo pipeline in SPAdes version 3.15 with the input set for unpaired Ion Torrent reads with 8 threads, kmers 21,33,55,77,99,127, the careful option to reduce the number of mismatches and short indels and all other parameters left as default.
-EXAMPLE - Mustelus palumbes
+2. Feed the reads into a _de novo_ pipeline in SPAdes version 3.15 with the input set for unpaired Ion Torrent reads with 8 threads, kmers 21,33,55,77,99,127, the careful option to reduce the number of mismatches and short indels and all other parameters left as default.
+EXAMPLE - _Mustelus palumbes_
 ```
 #!/bin/bash
 module load app/SPAdes
@@ -29,10 +29,10 @@ spades.py \
 	-o $work/Mpa \
 ```
 
-### STEP 2.3: de novo assembly
+### STEP 2.3: _de novo_ assembly
 
-Directly map raw reads (bam format) de novo.
-EXAMPLE - Mustelus palumbes
+1. Directly map raw reads (bam format) _de novo_.
+EXAMPLE - _Mustelus palumbes_
 ```
 #!/bin/bash
 module load app/SPAdes
@@ -56,12 +56,13 @@ spades.py \
 1. Annotate protein coding genes (PCGs), ribosomal (r)RNA and transfer (t)RNA genes using MitoAnnotator in MitoFish version 3.72 (Iwasaki et al., 2013; Sato et al., 2018). 
 2. Input the gene feature file from MitoAnnotator into Sequence Manipulation Suite 2 (Stothard, 2000) (set to Table 2 - vertebrate mitochondrial DNA) to check that the reading frame is correct for each PCG (no internal stop codons). 
 3. Follow the guidelines for submission to GenBank using Bankit (https://www.ncbi.nlm.nih.gov/WebSub/). After submission, download and save the GenBank files in this folder and import them into Geneious (version 2019.1.3).
-3. Check the annotated sequences in Geneious to ensure completeness and to manually count overlapping regions and intergenic spaces between PCGs, rRNAs, tRNAs, and non-coding regions.
+3. Check the annotated sequences in Geneious to ensure completeness and manually count overlapping regions and intergenic spaces between PCGs, rRNAs, tRNAs, and non-coding regions.
 4. Calculate A+T and G+T content and relative synonymous codon usage (RSCU) of PCGs in DAMBE v. 7.0.35 (Xia, 2001). Base composition skewness formula: AT-skew = [A-T]/[A + T] and GC-skew = [G-C]/[G + C] (Perna and Kocher, 1995). 
-5. Make graphs for nucleotide composition and RSCU in R (see scripts in relevant folders).
-6. Predict tRNA secondary structure using the generalized vertebrate mitochondrial tRNA settings in ARWEN v. 1.2.3 (Björn Canbäck Bioinformatics) (Laslett and Canbäck, 2008) and the tRNAscanSE webserver v. 2.0 (http://lowelab.ucsc.edu/cgi-bin/tRNAscan-SE2.cgi) (Lowe and Chan, 2016).
-7. Characterise control region repetitive regions using the “Tandem Repeat Finder” webserver (https://tandem.bu.edu/trf/trf.html) (Benson, 1999) maintaining default settings.
-8. Download the graphic produced by MitoAnnotator and save the files as a png. Edit and enlarge gene names and incude species-specific images, gene numberd and total length in the center.
+5. Make graphs for nucleotide composition and RSCU in R.
+***[See Nucleotide composition and RSCU scripts in "Scripts" folder]
+8. Predict tRNA secondary structure using the generalized vertebrate mitochondrial tRNA settings in ARWEN v. 1.2.3 (Björn Canbäck Bioinformatics) (Laslett and Canbäck, 2008) and the tRNAscanSE webserver v. 2.0 (http://lowelab.ucsc.edu/cgi-bin/tRNAscan-SE2.cgi) (Lowe and Chan, 2016).
+9. Characterise control region repetitive regions using the “Tandem Repeat Finder” webserver (https://tandem.bu.edu/trf/trf.html) (Benson, 1999) maintaining default settings.
+10. Download the graphic produced by MitoAnnotator and save the files as a png. Edit and enlarge gene names and incude species-specific images, gene numbers and total length in the center.
 
 ## STEP 4: Sequence alignments and concatenation
 
@@ -70,28 +71,27 @@ spades.py \
 1. Save the five newly assembled houndshark mitogenomes in Genbank (full) format in 1a_Data.
 2. Compile a list of mitogenome accession numbers from Wang et al. 2022 and Kousteni et al. 2021 as well as four outgroups each from the Lamniform and Orectolobiform orders and save the text file as kousteni-wang_mitogenomes_genbank.list.
 3. Use kousteni-wang_mitogenomes_genbank.list in a Batch Entrez(https://www.ncbi.nlm.nih.gov/sites/batchentrez) search to retrieve and download the mitogenome records in Genbank (full) format as a file named kousteni-wang.gb.
-4. Merge kousteni-wang.gb and the five newly assembled mitogenomes:
+4. Merge kousteni-wang.gb and the five newly assembled mitogenomes.
+```
 cat *.gb > winn_2022.gb.
+```
 
-### STEP 4.2: Gene region extrations
+### STEP 4.2: Gene region extractions
 
 1. Extract rRNA and CDS DNA sequences from the Genbank file using GBSEQEXTRACTOR v0.04 (https://github.com/linzhi2013/gbseqextractor).
 ```
 gbseqextractor -f winn_2022.gb -prefix winn_2022 -types rRNA -s # output file ´winn_2022.rrna.fasta´
 gbseqextractor -f winn_2022.gb -prefix winn_2022 -types CDS -s	# output file `winn_2022.cds.fasta´
 ```
-
 2. Merge the rRNA and CDS fasta files.
 ```
 cat winn_2022.rrna.fasta winn_2022.cds.fasta > winn_2022.cds-rrna.fasta
-	# Using Notepad+++, edit the file ´winn_2022.cds-rrna.fasta´ to standardize gene names.
-	# For instance, some GenBank records call 12S rRNA as s-rRNA, 12S ribosomal RNA or rrnS,
-	# CO1 as COX1, ND2 as nad2 etc. Standardize all genes to the following code: 
-	# 'ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA'.
-	# Save the edited file as `winn_2022.cds-rrna.std.fasta´.
 ```
-
-3. Extract individual gene sequences (.fa) from winn_2022.cds-rrna.std.fasta using the custom script maduna2022-gene-extractions.sh
+3. Using Notes, edit the file ´winn_2022.cds-rrna.fasta´ to standardize gene names.
+For instance, some GenBank records denote 12S rRNA as s-rRNA, 12S ribosomal RNA or rrnS, CO1 as COX1, ND2 as nad2 etc. 
+Standardize all genes to the following code:  'ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA'.
+4. Save the edited file as `winn_2022.cds-rrna.std.fasta´.
+5. Extract individual gene sequences (.fa) from winn_2022.cds-rrna.std.fasta using the custom script maduna2022-gene-extractions.sh:
 ```
 #!/bin/bash
 GENE=('ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4;' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA')
@@ -111,7 +111,7 @@ for f in *.fa
 ### STEP 4.3: Multiple Sequence Alignment
 
 1. Create a new folder called 2a_MACSE2. Download the latest version of MACSE and save 'macse_v2.06.jar' at present, in the folder.
-2. Save the extracted protein coding (PCG) genes from 1b_GeneExtract, first checking that they are in the correct orientation in Geneious 2019.2.1, as .fasta files in 2a_MACSE2.
+2. Check that the extracted protein coding genes  (PCGs) from 1b_GeneExtract are in the correct orientation in Geneious 2019.2.1 and save them as .fasta files in 2a_MACSE2.
 3. Align the PCGs using the for loop script maduna2022-13pcgs-msa.sh.
 ```
 #!/bin/bash
@@ -124,15 +124,13 @@ done
 	# gc_def: specify the genetic code 2 (The_Vertebrate_Mitochondrial_Code) or change accordingly for your study taxa.
 ```
 4. Align the rRNA genes using the online version of MAFFT (version 7, https://mafft.cbrc.jp/alignment/server/) using the Q-INS-i iterative refinement method, adjusting the direction according to the first sequences confirmed to be in the 5' to 3' direction.
-5. Open all alignments from 2a_MACSE in Geneious 2019.2.1 and remove stop codons and ensure each alignment has a length divisible by 3.
-6. Change the translation setting to Vertebrate Mitochondrial (Table 2) and check for internal stop codons. 
-7. If there are remaining ambiguosly aligned sites, remove them with BMGE version 1.12_1 maintaining default settings through the NGPhylogeny.fr webserver (https://ngphylogeny.fr/).
-8. Clean both rRNA alignments with BMGE.
-9. Export the edited alignments into the folder 2c_CleanEdit
-10. Concatenate the 13 PCGs in Geneious 2019.2.1 and save as 13PCGs_NT (Dataset 1) in fasta, nexus and phyllip format.
-11. Concatenate the 13 PCGs and 2 rRNA genes in Geneious and save as 13PCGs_2rRNAs_NT (Dataset 2) in fasta, nexus and phyllip format.
-12. Translate 13PCGs_NT and save as 13PCGs_AA (Dataset 3) in fasta, nexus and phyllip format.
-13. Make length summaries with the length and alignment locations of each alignment to use for the partition files.
+5. Open all alignments from 2a_MACSE in Geneious 2019.2.1, change the translation settings to Vertebrate Mitochondrial (Table 2), remove stop codons and ensure each alignment has a length divisible by 3.
+6. If there are remaining ambiguosly aligned sites, remove them with BMGE version 1.12_1 maintaining default settings through the NGPhylogeny.fr webserver (https://ngphylogeny.fr/). Clean both the rRNA alignments with BMGE.
+7. Export the edited alignments into the folder 2c_CleanEdit
+8. Concatenate the 13 PCGs in Geneious 2019.2.1 and save as 13PCGs_NT (Dataset 1) in fasta, nexus and phyllip format.
+9. Concatenate the 13 PCGs and 2 rRNA genes in Geneious and save as 13PCGs_2rRNAs_NT (Dataset 2) in fasta, nexus and phyllip format.
+10. Translate 13PCGs_NT and save as 13PCGs_AA (Dataset 3) in fasta, nexus and phyllip format.
+11. Make and save length summaries with the length and alignment locations of each alignment to use for the partition files.
 
 ## STEP 5: Substitution saturation and data partitioning schemes 
 
@@ -230,13 +228,14 @@ iqtree2 -s 13PCGs_NT.fasta -st AA -p PS5/PS5AA_run01_mf.best_scheme.nex -pre PS5
 
 ### STEP 5.5: evaluate the nucleotide substitution saturation values and likelihood statistics to select the best partitioning scheme.
 
-The initial partitioning scheme with the lowest AIC and highest concordance factor (straight line graph) should be the most accurate.
+Find these values in the IQTREE files.
+The initial partitioning scheme with the lowest AICc/BIC and highest concordance factor (straight line graph) should be the most accurate.
 
 ## STEP 6: Phylogenetic reconstructions 
 
 ### STEP 6.1: construct ML trees for each partitioning scheme
 
-Use substitution models indicated above in best_model.nex files for each partitioning scheme to construct Maximum Likelihood phylogenies.
+Use substitution models indicated in best_model.nex files for each partitioning scheme to construct Maximum Likelihood phylogenies.
 Use the Nearest Neighbor Interchange (NNI) approach to search for tree topology.
 Compute branch supports with 1000 replicates of the Shimodaira-Hasegawa approximate likelihood-ratio test (SH-aLRT; Anisimova and Gascuel, 2006) and the ultrafast bootstrapping (UFBoot2) approach (Hoang et al., 2018).
 
@@ -283,7 +282,7 @@ for g in *.nex
 		mb -i $g
 	done
 ```
-***[Scripts to plot MrBayes log files are stores as kmisc.R, mb_plots.R - https://rdrr.io/github/kmiddleton/kmmisc/man/plot_mrb.html]
+***[Scripts to plot MrBayes log files are stored as kmisc.R, mb_plots.R in "Scripts" folder - https://rdrr.io/github/kmiddleton/kmmisc/man/plot_mrb.html]
 
 ### STEP 6.3: computing confordance factors
 
@@ -380,12 +379,13 @@ module load app/IQTREE/1.6.12
 cd ./13PCGs_2rRNAs
 iqtree2 -s 13PCGs_2rRNAs_NT.fasta -z TopoTest_PS1-PS8.treesls --prefix TopoTest_run01 -n 0 -zb 10000 -zw -au -nt AUTO
 ```
-***[A tree is rejected if its p-value < 0.05 (marked with a - sign) for KH, SH and AU tests.]
-***[bp-RELL and c-ELW return posterior weights which are not p-values. The weights sum up to 1 across the trees tested.]
+A tree is rejected if its p-value < 0.05 (marked with a - sign) for KH, SH and AU tests.
+_bp-RELL_ and _c-ELW_ return posterior weights which are not p-values. The weights sum up to 1 across the trees tested.
 
 ### STEP 6.5: test the hypothesis of equal frequencies.
 
 Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and sites (sCF) supporting the two alternative topologies differ significantly as implemented in Lanfear’s R script (Minh et al., 2020) in R v.4.1.2 (R Core Team, 2021).
+***[Script saved in "Scripts" folder]
 
 ### STEP 6.6: visualising and analysing trees
 
@@ -403,7 +403,6 @@ Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and si
 
 1. Estimate individual gene trees for the 13 PCGs and 2 rRNAs based on the ML criterion in IQ-Tree.
 Use a greedy model selection strategy (-m MFP)and the NNI approach to search for tree topology and compute branch supports with 1000 bootstrapped replicates of the UFBoot2 approach (Hoang et al., 2018).
-
 ```
 for gene in *.fas
 	do
@@ -436,7 +435,6 @@ java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15
 java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15G.tre -t 8 -o elasmo-mitophy-15G-scored-t8.tre
 
 # Test for polytomies with the method of Sayyari and Mirarab (2018), which is based on a Chi-Square test among quartet frequencies for nodes, implemented with the -t 10 command. 
-
 java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15G.tre -t `10 -o elasmo-mitophy-15G-scored-t10.tre
 ```
 
@@ -452,40 +450,5 @@ Save the best supported trees above (with bootstrap values) in newick format.
 Navigate the the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and make a new project.
 Import the newick file.
 Adjust size and layout and select bootstrap values.
-Import annotations. We used the following:
-
-#### Family groups
-```
-## style 1	leaf_name	text=mammal,color=darkgreen,textorientation=vertical,linewidth=4,fontsize=16,linestyle=dashed
-## style 2-5	leaf_name	bkcolor=#BE4144,text=mammal,textorientation=vertical,linewidth=4,fontsize=16
-!grouplabel	style=2
-!op	0.8
-Chiloscyllium_griseum_NC_017882,Orectolobus_japonicus_NC_022148	bkcolor=darkgrey,text=Orectolobiformes
-Carcharhinus_brachyurus_NC_057525,Carcharhinus_leucas_NC_023522	bkcolor=#FCDABE,text=Carcharhinidae
-Sphyrna_lewini_NC_022679,Sphyrna_zygaena_NC_025778	bkcolor=#B7F1A5,text=Sphyrnidae
-Hemigaleus_microstoma_NC_029400,Hemipristis_elongata_NC_032065	bkcolor=#FF9AA2,text=Hemigaleidae
-Hemitriakis_japanica_NC_026774,Galeorhinus_galeus_ON652874	bkcolor=#B2EBF9,text=Triakidae
-Proscyllium_habereri_NC_030216	bkcolor=#FFFEC4,text=Proscyllidae
-Pseudotriakis_microdon_NC_022735	bkcolor=#F9D2EF,text=Pseudotriakidae
-Cephaloscyllium_umbratile_NC_029399,Poroderma_pantherinum_NC_043830	bkcolor=#C6B7F1,text=Scyliorhinidae
-Alopias_pelagicus_NC_022822, Lamna_ditropis_NC_024269	bkcolor=lightgrey,text=Lamniformes
-```
-#### Mustelus genus reproductive mode
-```
-!grouplabel	style=1
-!op	0.8
-Mustelus_asterias_ON652873,Triakis_megalopterus_ON075075	text=aplacental-spotted,color=#0033CC,textorientation=horizontal,linewidth=4,fontsize=14,linestyle=dashed
-Mustelus_griseus_NC_023527,Mustelus_mustelus_NC_039629	text=placental-non-spotted,color=#3399FF,textorientation=horizontal,linewidth=4,fontsize=14 
-```
-#### Bootstrap style
-```
-!bootstrapValueStyle	show=2,style=numeric,color=darkred,place=2,size=12
-```
-#### Marking our sequences
-```
-Mustelus_asterias_ON652873	star,red	
-Mustelus_palumbes_ON075076	star,red
-Triakis_megalopterus_ON075075	star,red
-Mustelus_mosis_ON075077		star,red
-Galeorhinus_galeus_ON652874	star,red
-```
+Import annotations.
+***[See annotations script in "Scripts" folder.
