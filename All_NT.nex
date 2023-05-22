@@ -1,4 +1,0 @@
-#NEXUS	
-begin sets;	
- charset all	=1-13871;
-end;	
