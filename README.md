@@ -5,13 +5,13 @@
 1. Check sequence quality in FastQC (http://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
 2. Trim adaptors and poor-quality bases (phred score below 16) and remove reads shorter than 25 base pairs (bp) with Torrent Suite Software 5.16.
 
-## STEP 2: Mitogenome assemblies  
+## STEP 2: Mitogenome assemblies 
 
-### STEP 2.1: reference-based assembly
+### STEP 2.1: Reference-based assembly
 
 1. Align raw reads to the _Mustelus mustelus_ mitogenome (NC_039629.1) using the Geneious read mapper with medium sensitivity settings and five iterations in Geneious Prime (version 2019.1.3).
 
-### STEP 2.2: baited assembly
+### STEP 2.2: Baited assembly
 
 1. Extract reads that mapped to the reference genome in bam format.
 2. Feed the reads into a _de novo_ pipeline in SPAdes version 3.15 with the input set for unpaired Ion Torrent reads with 8 threads, kmers 21,33,55,77,99,127, the careful option to reduce the number of mismatches and short indels and all other parameters left as default.
@@ -134,23 +134,23 @@ done
 
 ## STEP 5: Substitution saturation and data partitioning schemes 
 
-### STEP 5.1: construct 10 partition nexus files, two for dataset 1, six for dataset 2 and two for dataset 3.
-
-Dataset 1: one partition for the entire alignement, 13 paritions for each PCG.
-Dataset 2: one partition for the entire alignment, two paritions (rRNA and PCGs), 15 partitions (for each rRNA and PCG), 28 partitions (for each rRNA and for codon position 1 and 2), 28 partitions (for each rRNA and for codon position 1 and 3), 41 partitions (for each rRNA and for each codon position in each PCG).
-Dataset 3: one partition for the entire alignment, 13 partitions for each PCG.
-***[See "Partitions" to access these files.]
-
-### STEP 5.2: test for nucleotide saturation
+### STEP 5.1: Test for nucleotide saturation.
 
 1. Perform two-tailed tests to examine the degree of nucleotide substitution saturation (Xia et al., 2003) for each gene as well as each codon position of the 13 PCGs, 13PCGs_NT and 13PCGs_rRNAs_NT.
 Take into account the proportion of invariant sites as recommended by Xia and Lemey (2009) in DAMBE v.7.2.141 (Xia, 2018). 
 2. Visually inspect substitution saturation by plotting the number of transitions (s) and transversions (v) versus divergence.
 Divergence is based on genetic distances derived from the Kimura two-parameter (K2P or K80) substitution model (Kimura, 1980). 
 The K80 substitution model accommodates transition/transversion rate. 
-Bias and the ‘K80 distance’ is expected to increase linearly with divergence time. 
+Bias and the ‘K80 distance’ is expected to increase linearly with divergence time.
 
-### STEP 5.3: use MODELFINDER v. 1.6.12 (Kalyaanamoorthy et al., 2017) in IQTree v. 2.1.3 (Minh et al., 2020) to determine the best partitioning scheme & corresponding evolutionary models to use in a Maximum Likelihood analysis.
+ ### STEP 5.2: Construct 10 partition nexus files, two for dataset 1, six for dataset 2 and two for dataset 3.
+
+Dataset 1: one partition for the entire alignement, 13 paritions for each PCG.
+Dataset 2: one partition for the entire alignment, two paritions (rRNA and PCGs), 15 partitions (for each rRNA and PCG), 28 partitions (for each rRNA and for codon position 1 and 2), 28 partitions (for each rRNA and for codon position 1 and 3), 41 partitions (for each rRNA and for each codon position in each PCG).
+Dataset 3: one partition for the entire alignment, 13 partitions for each PCG.
+***[See "Partitions" to access these files.]
+
+### STEP 5.3: Use MODELFINDER v. 1.6.12 (Kalyaanamoorthy et al., 2017) in IQTree v. 2.1.3 (Minh et al., 2020) to determine the best partitioning scheme & corresponding evolutionary models to use in a Maximum Likelihood analysis.
 
 Apply the new model selection procedure (-m MF+MERGE)  which additionally implements the FreeRate heterogeneity model, inferring the site rates directly from the data instead of being drawn from a gamma distribution (-cmax 20; Soubrier et al., 2012).
 The top 30% partition schemes were checked using the relaxed clustering algorithm (− rcluster 30), as described in Lanfear et al. (2014). 
@@ -226,16 +226,16 @@ iqtree2 -s 13PCGs_NT.fasta -st AA -p PS1/PS1AA_run01_mf.best_scheme.nex -pre PS1
 iqtree2 -s 13PCGs_NT.fasta -st AA -p PS5/PS5AA_run01_mf.best_scheme.nex -pre PS5/PS5AA_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
 ```
 
-### STEP 5.5: evaluate the nucleotide substitution saturation values and likelihood statistics to select the best partitioning scheme.
+### STEP 5.5: Evaluate the likelihood statistics to select the best partitioning scheme.
 
 Find these values in the IQTREE files.
 The initial partitioning scheme with the lowest AICc/BIC and highest concordance factor (straight line graph) should be the most accurate.
 
 ## STEP 6: Phylogenetic reconstructions 
 
-### STEP 6.1: construct ML trees for each partitioning scheme
+### STEP 6.1: Construct ML trees for each partitioning scheme.
 
-Use substitution models indicated in best_model.nex files for each partitioning scheme to construct Maximum Likelihood phylogenies.
+Use the substitution models indicated in best_model.nex files for each partitioning scheme to construct Maximum Likelihood phylogenies.
 Use the Nearest Neighbor Interchange (NNI) approach to search for tree topology.
 Compute branch supports with 1000 replicates of the Shimodaira-Hasegawa approximate likelihood-ratio test (SH-aLRT; Anisimova and Gascuel, 2006) and the ultrafast bootstrapping (UFBoot2) approach (Hoang et al., 2018).
 
@@ -270,10 +270,9 @@ iqtree2 -s 13PCGs_AA.fasta -st AA -p PS1/PS1AA_run01_mf.best_model.nex -pre PS1/
 iqtree2 -s 13PCGs_AA.fasta -st AA -p PS5/PS5AA_run01_mf.best_model.nex -pre PS5/PS5AA_run02_ml -T 3 -B 1000 -alrt 1000
 ```
 
-### STEP 6.2: BI tree reconstruction
+### STEP 6.2: Perform Bayesian Inference analysis using the Cyberinfrastructure for Phylogenetic Research (CIPRES) Science Gateway portal v. 3.3 (www.phylo.org) at the San Diego Supercomputer Center (Miller et al., 2010).
 
-1. Perform Bayesian Inference analysis using the Cyberinfrastructure for Phylogenetic Research (CIPRES) Science Gateway portal v. 3.3 (www.phylo.org) at the San Diego Supercomputer Center (Miller et al., 2010).
-Run a pair of independent searches for 5 million generations, with trees saved every 1,000 generations and the first 2,500 sampled trees of each search discarded as burn-in. 
+1. Run a pair of independent searches for 5 million generations, with trees saved every 1,000 generations and the first 2,500 sampled trees of each search discarded as burn-in. 
 2. Screen the model parameter summary statistics Estimated Sample Size (ESS) and Potential Scale Reduction Factor (PSRF), where convergence occurred at ESS >200, and PSRF ~1.0. 
 ```
 #!/bin/bash
@@ -284,7 +283,7 @@ for g in *.nex
 ```
 ***[Scripts to plot MrBayes log files are stored as kmisc.R, mb_plots.R in "Scripts" folder - https://rdrr.io/github/kmiddleton/kmmisc/man/plot_mrb.html]
 
-### STEP 6.3: computing confordance factors
+### STEP 6.3: Computing confordance factors
 
 Investigate topological conflict around each branch of the species tree by calculating gene and site concordance factors in IQ-Tree.
 Infer concatenation-based species trees with 1000 ultrafast bootstraps and an edge-linked partition model.
@@ -382,12 +381,12 @@ iqtree2 -s 13PCGs_2rRNAs_NT.fasta -z TopoTest_PS1-PS8.treesls --prefix TopoTest_
 A tree is rejected if its p-value < 0.05 (marked with a - sign) for KH, SH and AU tests.
 _bp-RELL_ and _c-ELW_ return posterior weights which are not p-values. The weights sum up to 1 across the trees tested.
 
-### STEP 6.5: test the hypothesis of equal frequencies.
+### STEP 6.5: Test the hypothesis of equal frequencies.
 
 Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and sites (sCF) supporting the two alternative topologies differ significantly as implemented in Lanfear’s R script (Minh et al., 2020) in R v.4.1.2 (R Core Team, 2021).
 ***[Script saved in "Scripts" folder]
 
-### STEP 6.6: visualising and analysing trees
+### STEP 6.6: Visualising and analysing trees
 
 1. Open all nex.treefile from the ML and BI analyses in FigTree and root at the outgroup.
 2. Align nodes and view in increasing order.
@@ -397,7 +396,7 @@ Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and si
 ***[Nodes with UFBoot2 ≥ 95, PP ≥ 95 and SH-aLRT ≥ 80 were considered well supported (Minh et al., 2020b).]
 ***[Nodes with sCF values below 33% and gCF values that are lower than sCF values or near zero require further attention].
 
-## STEP 7: comparing species trees to gene trees under the multispecies coalescent model.
+## STEP 7: Comparing species trees to gene trees under the multispecies coalescent model.
 
 ### STEP 7.1: ASTRAL
 
