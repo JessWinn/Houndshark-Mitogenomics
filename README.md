@@ -452,4 +452,4 @@ Navigate the the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and
 Import the newick file.
 Adjust size and layout and select bootstrap values.
 Import annotations.
-***[See annotations script in "Scripts" folder.
+***[See annotations script in "Scripts" folder.]
