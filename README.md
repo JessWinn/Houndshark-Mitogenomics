@@ -4,7 +4,7 @@
 
 1. Check sequence quality in FastQC (http://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
 2. Trim adaptors and poor-quality bases (phred score below 16) and remove reads shorter than 25 base pairs (bp) in Torrent Suite Version 5.16.
-***[Trimmed sequencing reads in BAM format can be found in the "Data" folder.]
+***[Trimmed sequencing reads in BAM format can be found in the "1_Quality control of sequencing data" folder.]
 
 ## STEP 2: Mitogenome assembly
 
@@ -50,7 +50,9 @@ spades.py \
 ### STEP 2.4: Assembly comparison
 
 1. Align the three assemblies to each other using the Geneious alignment tool with default parameters. 
-2. Check each alignment for discrepancies on  Geneious and ediit maually to obtain the final genome sequence.
+2. Check each alignment for discrepancies on  Geneious and edit maually to obtain the final genome sequence.
+3. If there is a significant discrepancy between the three alignments further investigation is warranted. We Sanger sequenced a region of our _Galeorhinus galeus_ mitogenome that we could not find a consensus on when comparing our three assemblies. We compared the Sanger sequence fragment to our three assemblies and found that it matched a section of the _de novo_ assembly that the reference assembly failed to detect. The full details on this step can be found in the Supplementary material of Winn et al. (2023).
+***[All our mitogenome assemblies are in the folder "2_Mitogenome assembly".]
 
 ## STEP 3: Mitogenome annotation
 
@@ -60,7 +62,7 @@ spades.py \
 3. Check the annotated sequences in Geneious to ensure completeness and manually count overlapping regions and intergenic spaces between PCGs, rRNAs, tRNAs, and non-coding regions.
 4. Calculate A+T and G+T content and relative synonymous codon usage (RSCU) of PCGs in DAMBE v. 7.0.35 (Xia, 2001). Base composition skewness formula: AT-skew = [A-T]/[A + T] and GC-skew = [G-C]/[G + C] (Perna and Kocher, 1995). 
 5. Make graphs for nucleotide composition and RSCU in R.
-***[See Nucleotide composition and RSCU scripts in "Scripts" folder.]
+***[See Nucleotide composition and RSCU scripts in "3_Mitogenome annotation" folder.]
 8. Predict tRNA secondary structure using the generalized vertebrate mitochondrial tRNA settings in ARWEN v. 1.2.3 (Björn Canbäck Bioinformatics) (Laslett and Canbäck, 2008) and the tRNAscanSE webserver v. 2.0 (http://lowelab.ucsc.edu/cgi-bin/tRNAscan-SE2.cgi) (Lowe and Chan, 2016).
 9. Characterise control region repetitive regions using the “Tandem Repeat Finder” webserver (https://tandem.bu.edu/trf/trf.html) (Benson, 1999) maintaining default settings.
 10. Download the graphic produced by MitoAnnotator and save the files as a png. Edit and enlarge gene names and incude species-specific images, gene numbers and total length in the center.
@@ -70,13 +72,14 @@ spades.py \
 
 ### STEP 4.1: Ingroup and outgroup mitogenome retrieval from GenBank 
 
-1. Save the five newly assembled houndshark mitogenomes in Genbank (full) format in 1a_Data.
+1. Save the five newly assembled houndshark mitogenomes in Genbank (full) format.
 2. Compile a list of mitogenome accession numbers from Wang et al. 2022 and Kousteni et al. 2021 as well as four outgroups each from the Lamniform and Orectolobiform orders and save the text file as kousteni-wang_mitogenomes_genbank.list.
 3. Use kousteni-wang_mitogenomes_genbank.list in a Batch Entrez (https://www.ncbi.nlm.nih.gov/sites/batchentrez) search to retrieve and download the mitogenome records in Genbank (full) format as a file named kousteni-wang.gb.
 4. Merge kousteni-wang.gb and the five newly assembled mitogenomes.
 ```
 cat *.gb > winn_2023.gb.
 ```
+***[GenBank files and accession number lists for our dataset are in the folder "Sequence Alignment and concatenation".] 
 
 ### STEP 4.2: Gene region extractions
 
@@ -133,14 +136,13 @@ done
 9. Concatenate the 13 PCGs and 2 rRNA genes in Geneious and save as 13PCGs_2rRNAs_NT (Dataset 2) in fasta, nexus and phyllip format.
 10. Translate 13PCGs_NT and save as 13PCGs_AA (Dataset 3) in fasta, nexus and phyllip format.
 11. Make and save length summaries with the length and alignment locations of each alignment to use for the partition files.
-***[Alignment files and length summaries are in "Data".]
 
-## STEP 5: Substitution saturation and _a priori_ partitioning
+## STEP 5: Substitution saturation and _a priori_ data partitioning
 
 ### STEP 5.1: Test for nucleotide saturation.
 
-1. Perform two-tailed tests to examine the degree of nucleotide substitution saturation (Xia et al., 2003) for each gene as well as each codon position of the 13 PCGs, 13PCGs_NT and 13PCGs_rRNAs_NT, taking into account the proportion of invariant sites as recommended by Xia and Lemey (2009), in DAMBE v.7.2.141 (Xia, 2018).
-Use  
+1. Perform two-tailed tests to examine the degree of nucleotide substitution saturation (Xia et al., 2003) for each gene and each codon position of the 13PCGs as well as on the entire 13_PCGs_NT and 13PCGs_rRNAs_NT datasets, taking into account the proportion of invariant sites as recommended by Xia and Lemey (2009), in DAMBE v.7.2.141 (Xia, 2018).
+***[Single genes and concatenated datasets can be found in the folder "5_Substitution saturation and data partitioning".]
 3. Visually inspect substitution saturation by plotting the number of transitions (s) and transversions (v) versus divergence.
 Divergence is based on genetic distances derived from the Kimura two-parameter (K2P or K80) substitution model (Kimura, 1980). 
 The K80 substitution model accommodates transition/transversion rate. 
@@ -152,90 +154,10 @@ See: https://www.researchgate.net/publication/232048505_Assesing_substitution_sa
 Dataset 1: one partition for the entire alignement, 13 paritions for each PCG.
 Dataset 2: one partition for the entire alignment, two paritions (rRNA and PCGs), 15 partitions (for each rRNA and PCG), 28 partitions (for each rRNA and for codon position 1 and 2), 28 partitions (for each rRNA and for codon position 1 and 3), 41 partitions (for each rRNA and for each codon position in each PCG).
 Dataset 3: one partition for the entire alignment, 13 partitions for each PCG.
-***[See "Partitions" to access these files.]
-
-### STEP 5.3: Use MODELFINDER v. 1.6.12 (Kalyaanamoorthy et al., 2017) in IQTree v. 2.1.3 (Minh et al., 2020) to determine the best partitioning scheme and corresponding evolutionary models to use in a Maximum Likelihood analysis.
-
-Apply the new model selection procedure (-m MF+MERGE) which additionally implements the FreeRate heterogeneity model, inferring the site rates directly from the data instead of being drawn from a gamma distribution (-cmax 20; Soubrier et al., 2012).
-The top 30% partition schemes were checked using the relaxed clustering algorithm (− rcluster 30), as described in Lanfear et al. (2014). 
-The maximum number of rate categories, cmax, is set to 20 since it is likely to observe more rate variations for alignments with many sequences. 
-3 CPU cores, T, are used to decrease computational burden.
-
-1. 13 PCGs_NT
-```
-#!/bin/bash
-module load app/IQTREE/2.1.3
-cd *./13PCGs
-iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS1/PS1.txt -pre PS1/PS1_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
-iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS5/PS5.txt -pre PS5/PS5_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
-```
-2. 13PCGs_2rRNAs_NT
-```
-#!/bin/bash
-module load app/IQTREE/2.1.3
-cd *./13PCGs_2rRNAs
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS1/PS1.txt -pre PS1/PS1_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS2/PS2.txt -pre PS2/PS2_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS3/PS3.txt -pre PS3/PS3_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS4/PS4.txt -pre PS4/PS4_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS5/PS5.txt -pre PS5/PS5_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS6/PS6.txt -pre PS6/PS6_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS7/PS7.txt -pre PS7/PS7_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS8/PS8.txt -pre PS8/PS8_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
-```
-3. 13PCGs_AA
-```
-#!/bin/bash
-module load app/IQTREE/2.1.3
-cd *./13PCGs
-iqtree2 -s 13PCGs_AA.fasta -st AA -p PS1/PS1AA.txt -pre PS1/PS1AA_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
-iqtree2 -s 13PCGs_AA.fasta -st AA -p PS5/PS5AA.txt -pre PS5/PS5AA_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
-```
-
-***[Repeat the above using the Bayesian Information Critereon (BIC).]
-
-### STEP 5.4: Use MODELFINDER in IQTree to determine the best partitioning scheme & corresponding evolutionary models to use in BI analyses.
-
-Apply secondary model selection for the best-fitting partitioning identified by ModelFinder in Step 5.3 under the FreeRate heterogeneity model to select the next best model for Bayesian inference.
-Rerun ModelFinder with options: -m TESTONLY -mset mrbayes to restrict the results to models supported by MrBayes.
-
-1. 13PCGs_NT
-```
-#!/bin/bash
-module load app/IQTREE/2.1.3
-cd *./13PCGs
-iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS1/PS1_run01_mf.best_scheme.nex -pre PS1/PS1_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
-iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS5/PS5_run01_mf.best_scheme.nex -pre PS5/PS5_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
-```
-2. 13PCGs_2rRNAs
-```
-#!/bin/bash
-module load app/IQTREE/2.1.3
-cd *./13PCGs_2rRNAs
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS1/PS1_run01_mf.best_scheme.nex -pre PS1/PS1_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS2/PS2_run01_mf.best_scheme.nex -pre PS2/PS2_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS3/PS3_run01_mf.best_scheme.nex -pre PS3/PS3_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS4/PS4_run01_mf.best_scheme.nex -pre PS4/PS4_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS5/PS5_run01_mf.best_scheme.nex -pre PS5/PS5_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS6/PS6_run01_mf.best_scheme.nex -pre PS6/PS6_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS7/PS7_run01_mf.best_scheme.nex -pre PS7/PS7_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
-iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS8/PS8_run01_mf.best_scheme.nex -pre PS8/PS8_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
-```
-3. 13PCGs_AA
-```
-#!/bin/bash
-module load app/IQTREE/2.1.3
-cd *./13PCGs
-iqtree2 -s 13PCGs_NT.fasta -st AA -p PS1/PS1AA_run01_mf.best_scheme.nex -pre PS1/PS1AA_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
-iqtree2 -s 13PCGs_NT.fasta -st AA -p PS5/PS5AA_run01_mf.best_scheme.nex -pre PS5/PS5AA_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
-```
-
-### STEP 5.5: Evaluate likelihood statistics to select the best partitioning scheme.
-
-These values can be found in the IQTREE files generated by ModelFinder.
-The partitioning scheme with the lowest AICc/BIC and highest concordance factor (straight line graph) should be the most accurate.
 
 ## STEP 6: Mitophylogenomic reconstruction
+
+***[Partition files and alignment Datasets are saved in "6_Mitophylogenomic reconstruction".]
 
 ### STEP 6.1: Use MODELFINDER v. 1.6.12 (Kalyaanamoorthy et al., 2017) in IQTree v. 2.1.3 (Minh et al., 2020) to determine the best partitioning scheme and corresponding evolutionary models to use in a Maximum Likelihood analysis.
 
@@ -483,7 +405,8 @@ Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and si
 
 ## STEP 7: Multispecies coalescent model
 
-Estimates the effects of gene-tree conflict on species-tree inference. 
+Estimates the effects of gene-tree conflict on species-tree inference.
+***[Input files are in the folder "7_Multispecies coalescent model".]
 
 ### STEP 7.1: ASTRAL
 
@@ -537,4 +460,4 @@ Navigate the the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and
 Import the newick file.
 Adjust size and layout and select bootstrap values.
 Import annotations.
-***[See annotations script in "Scripts" folder.]
+***[See annotations script in "8_Consensus tree construction" folder.]
