@@ -1,8 +1,0 @@
-PS1 - None (1 partition)
-PS2 - Codon: pos1 + pos2 + pos3 + 2 rRNAs (5 partitions)
-PS3 - Codon: pos1_pos2 + pos3 + 2 rRNAs (4 partitions)
-PS4 - Codon: pos1 + pos3 + 2 rRNAs (4 partitions)
-PS5 - Gene: 13 PCGs + 2 rRNAs (15 partitions)
-PS6 - GeneXCodon: 13 PCGs pos1 + 13 pos2 + 13 pos2 + 2 rRNAs (41 partitions)
-PS7 - GeneXCodon: 13 PCGs pos1_pos2 + 13 PCGs pos3 + 2 rRNAs  (28 partitions)
-PS8 - GeneXCodon: 13 PCGs pos1 + 13 PCGs pos3 + 2 rRNAs  (28 partitions)
