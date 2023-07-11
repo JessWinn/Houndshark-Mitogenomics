@@ -453,7 +453,7 @@ java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15
 2. Open the nexus file in PAUP* v4.0a 169 (Swofford, 2003).
 3. Implement the multispecies coalescent tree model with random quartet sampling of 100,000 replicates and 1,000 bootstrap replicates (https://phylosolutions.com/tutorials/svdq-qage/svdq-qage-tutorial.html).
 
-### STEP 8: Consensus tree construction
+## STEP 8: Consensus tree construction
 
 Save the best supported trees above (with bootstrap values) in newick format.
 Navigate the the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and make a new project.
