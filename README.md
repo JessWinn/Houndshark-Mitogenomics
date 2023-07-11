@@ -1,6 +1,6 @@
 # Bioinformatics pipeline of Winn et al. (2023) - Triakid Mitophylogenomics
 
-## STEP 1: Quality Control of Ion GeneStudio™ S5 sequencing data
+## STEP 1: Quality control of Ion GeneStudio™ S5 sequencing data
 
 1. Check sequence quality in FastQC (http://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
 2. Trim adaptors and poor-quality bases (phred score below 16) and remove reads shorter than 25 base pairs (bp) in Torrent Suite Version 5.16.
@@ -72,7 +72,7 @@ spades.py \
 
 1. Save the five newly assembled houndshark mitogenomes in Genbank (full) format in 1a_Data.
 2. Compile a list of mitogenome accession numbers from Wang et al. 2022 and Kousteni et al. 2021 as well as four outgroups each from the Lamniform and Orectolobiform orders and save the text file as kousteni-wang_mitogenomes_genbank.list.
-3. Use kousteni-wang_mitogenomes_genbank.list in a Batch Entrez(https://www.ncbi.nlm.nih.gov/sites/batchentrez) search to retrieve and download the mitogenome records in Genbank (full) format as a file named kousteni-wang.gb.
+3. Use kousteni-wang_mitogenomes_genbank.list in a Batch Entrez (https://www.ncbi.nlm.nih.gov/sites/batchentrez) search to retrieve and download the mitogenome records in Genbank (full) format as a file named kousteni-wang.gb.
 4. Merge kousteni-wang.gb and the five newly assembled mitogenomes.
 ```
 cat *.gb > winn_2023.gb.
@@ -135,15 +135,17 @@ done
 11. Make and save length summaries with the length and alignment locations of each alignment to use for the partition files.
 ***[Alignment files and length summaries are in "Data".]
 
-## STEP 5: Substitution saturation and data partitioning 
+## STEP 5: Substitution saturation and _a priori_ partitioning
 
 ### STEP 5.1: Test for nucleotide saturation.
 
-1. Perform two-tailed tests to examine the degree of nucleotide substitution saturation (Xia et al., 2003) for each gene as well as each codon position of the 13 PCGs, 13PCGs_NT and 13PCGs_rRNAs_NT, taking into account the proportion of invariant sites as recommended by Xia and Lemey (2009), in DAMBE v.7.2.141 (Xia, 2018). 
-2. Visually inspect substitution saturation by plotting the number of transitions (s) and transversions (v) versus divergence.
+1. Perform two-tailed tests to examine the degree of nucleotide substitution saturation (Xia et al., 2003) for each gene as well as each codon position of the 13 PCGs, 13PCGs_NT and 13PCGs_rRNAs_NT, taking into account the proportion of invariant sites as recommended by Xia and Lemey (2009), in DAMBE v.7.2.141 (Xia, 2018).
+Use  
+3. Visually inspect substitution saturation by plotting the number of transitions (s) and transversions (v) versus divergence.
 Divergence is based on genetic distances derived from the Kimura two-parameter (K2P or K80) substitution model (Kimura, 1980). 
 The K80 substitution model accommodates transition/transversion rate. 
 Bias and the ‘K80 distance’ is expected to increase linearly with divergence time.
+See: https://www.researchgate.net/publication/232048505_Assesing_substitution_saturation_with_DAMBE for a more detailed tutorial.
 
  ### STEP 5.2: Construct 10 partition nexus files, two for dataset 1, six for dataset 2 and two for dataset 3.
 
@@ -192,7 +194,7 @@ iqtree2 -s 13PCGs_AA.fasta -st AA -p PS5/PS5AA.txt -pre PS5/PS5AA_run01_mf -m MF
 
 ***[Repeat the above using the Bayesian Information Critereon (BIC).]
 
-### STEP 5.4: Use MODELFINDER in IQTree to determine the best partitioning scheme & corresponding evolutionary models to use in BI analyses
+### STEP 5.4: Use MODELFINDER in IQTree to determine the best partitioning scheme & corresponding evolutionary models to use in BI analyses.
 
 Apply secondary model selection for the best-fitting partitioning identified by ModelFinder in Step 5.3 under the FreeRate heterogeneity model to select the next best model for Bayesian inference.
 Rerun ModelFinder with options: -m TESTONLY -mset mrbayes to restrict the results to models supported by MrBayes.
@@ -235,7 +237,88 @@ The partitioning scheme with the lowest AICc/BIC and highest concordance factor 
 
 ## STEP 6: Mitophylogenomic reconstruction
 
-### STEP 6.1: Construct ML trees for each partitioning scheme.
+### STEP 6.1: Use MODELFINDER v. 1.6.12 (Kalyaanamoorthy et al., 2017) in IQTree v. 2.1.3 (Minh et al., 2020) to determine the best partitioning scheme and corresponding evolutionary models to use in a Maximum Likelihood analysis.
+
+Apply the new model selection procedure (-m MF+MERGE) which additionally implements the FreeRate heterogeneity model, inferring the site rates directly from the data instead of being drawn from a gamma distribution (-cmax 20; Soubrier et al., 2012).
+The top 30% partition schemes were checked using the relaxed clustering algorithm (− rcluster 30), as described in Lanfear et al. (2014). 
+The maximum number of rate categories, cmax, is set to 20 since it is likely to observe more rate variations for alignments with many sequences. 
+3 CPU cores, T, are used to decrease computational burden.
+
+1. 13 PCGs_NT
+```
+#!/bin/bash
+module load app/IQTREE/2.1.3
+cd *./13PCGs
+iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS1/PS1.txt -pre PS1/PS1_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS5/PS5.txt -pre PS5/PS5_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+```
+2. 13PCGs_2rRNAs_NT
+```
+#!/bin/bash
+module load app/IQTREE/2.1.3
+cd *./13PCGs_2rRNAs
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS1/PS1.txt -pre PS1/PS1_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS2/PS2.txt -pre PS2/PS2_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS3/PS3.txt -pre PS3/PS3_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS4/PS4.txt -pre PS4/PS4_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS5/PS5.txt -pre PS5/PS5_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS6/PS6.txt -pre PS6/PS6_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS7/PS7.txt -pre PS7/PS7_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS8/PS8.txt -pre PS8/PS8_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+```
+3. 13PCGs_AA
+```
+#!/bin/bash
+module load app/IQTREE/2.1.3
+cd *./13PCGs
+iqtree2 -s 13PCGs_AA.fasta -st AA -p PS1/PS1AA.txt -pre PS1/PS1AA_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+iqtree2 -s 13PCGs_AA.fasta -st AA -p PS5/PS5AA.txt -pre PS5/PS5AA_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
+```
+
+***[Repeat the above using the Bayesian Information Critereon (BIC).]
+
+### STEP 6.2: Use MODELFINDER in IQTree to determine the best partitioning scheme & corresponding evolutionary models to use in BI analyses.
+
+Apply secondary model selection for the best-fitting partitioning identified by ModelFinder in Step 6.1 under the FreeRate heterogeneity model to select the next best model for Bayesian inference.
+Rerun ModelFinder with options: -m TESTONLY -mset mrbayes to restrict the results to models supported by MrBayes.
+
+1. 13PCGs_NT
+```
+#!/bin/bash
+module load app/IQTREE/2.1.3
+cd *./13PCGs
+iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS1/PS1_run01_mf.best_scheme.nex -pre PS1/PS1_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS5/PS5_run01_mf.best_scheme.nex -pre PS5/PS5_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+```
+2. 13PCGs_2rRNAs
+```
+#!/bin/bash
+module load app/IQTREE/2.1.3
+cd *./13PCGs_2rRNAs
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS1/PS1_run01_mf.best_scheme.nex -pre PS1/PS1_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS2/PS2_run01_mf.best_scheme.nex -pre PS2/PS2_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS3/PS3_run01_mf.best_scheme.nex -pre PS3/PS3_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS4/PS4_run01_mf.best_scheme.nex -pre PS4/PS4_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS5/PS5_run01_mf.best_scheme.nex -pre PS5/PS5_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS6/PS6_run01_mf.best_scheme.nex -pre PS6/PS6_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS7/PS7_run01_mf.best_scheme.nex -pre PS7/PS7_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS8/PS8_run01_mf.best_scheme.nex -pre PS8/PS8_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+```
+3. 13PCGs_AA
+```
+#!/bin/bash
+module load app/IQTREE/2.1.3
+cd *./13PCGs
+iqtree2 -s 13PCGs_NT.fasta -st AA -p PS1/PS1AA_run01_mf.best_scheme.nex -pre PS1/PS1AA_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+iqtree2 -s 13PCGs_NT.fasta -st AA -p PS5/PS5AA_run01_mf.best_scheme.nex -pre PS5/PS5AA_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
+```
+
+### STEP 6.3: Evaluate likelihood statistics to select the best partitioning scheme.
+
+These values can be found in the IQTREE files generated by ModelFinder.
+The partitioning scheme with the lowest AICc/BIC and highest concordance factor (straight line graph) should be the most accurate.
+
+### STEP 6.4: Construct ML trees for each partitioning scheme.
 
 Use the substitution models indicated in best_model.nex files for each partitioning scheme to construct Maximum Likelihood phylogenies.
 Use the Nearest Neighbor Interchange (NNI) approach to search for tree topology.
@@ -272,7 +355,7 @@ iqtree2 -s 13PCGs_AA.fasta -st AA -p PS1/PS1AA_run01_mf.best_model.nex -pre PS1/
 iqtree2 -s 13PCGs_AA.fasta -st AA -p PS5/PS5AA_run01_mf.best_model.nex -pre PS5/PS5AA_run02_ml -T 3 -B 1000 -alrt 1000
 ```
 
-### STEP 6.2: Perform Bayesian Inference analysis using the Cyberinfrastructure for Phylogenetic Research (CIPRES) Science Gateway portal v. 3.3 (www.phylo.org) at the San Diego Supercomputer Center (Miller et al., 2010).
+### STEP 6.5: Perform Bayesian Inference analysis using the Cyberinfrastructure for Phylogenetic Research (CIPRES) Science Gateway portal v. 3.3 (www.phylo.org) at the San Diego Supercomputer Center (Miller et al., 2010).
 
 1. Run a pair of independent searches for 5 million generations, with trees saved every 1,000 generations and the first 2,500 sampled trees of each search discarded as burn-in. 
 2. Screen the model parameter summary statistics Estimated Sample Size (ESS) and Potential Scale Reduction Factor (PSRF), where convergence occurred at ESS >200, and PSRF ~1.0. 
@@ -285,7 +368,7 @@ for g in *.nex
 ```
 ***[Scripts to plot MrBayes log files are stored as kmisc.R, mb_plots.R in "Scripts" folder - https://rdrr.io/github/kmiddleton/kmmisc/man/plot_mrb.html.]
 
-### STEP 6.3: Compute confordance factors
+### STEP 6.6: Compute confordance factors
 
 Investigate topological conflict around each branch of the species tree by calculating gene and site concordance factors in IQ-Tree.
 Infer concatenation-based species trees with 1000 ultrafast bootstraps and an edge-linked partition model.
@@ -364,7 +447,7 @@ iqtree2 -s 13PCGs_AA.fasta -S PS5/PS5AA_run01_mf.best_scheme.nex --prefix PS5/PS
 iqtree2 -t PS1/PS1AA_run03_concat.condonpart.MF.treefile --gcf PS1/PS1AA_run03_loci.condonpart.MF.treefile -s 13PCGs_AA.fasta --scf 100 -seed 471990 --prefix PS1/PS1AA_run03_concord
 iqtree2 -t PS5/PS5AA_run03_concat.condonpart.MF.treefile --gcf PS5/PS5AA_run03_loci.condonpart.MF.treefile -s 13PCGs_AA.fasta --scf 100 -seed 471990 --prefix PS5/PS5AA_run03_concord
 ```
-### STEP 6.4: Run the approximately unbiased (AU) tree topology test.
+### STEP 6.7: Run the approximately unbiased (AU) tree topology test.
 
 Compare the trees from the eight runs to determine significant diﬀerences with the approximately unbiased (AU) tree topology test (Shimodaira, 2002) also implemented in IQ-Tree.
 1. Save the final eight treefiles as a list in Newick format.
@@ -383,12 +466,12 @@ iqtree2 -s 13PCGs_2rRNAs_NT.fasta -z TopoTest_PS1-PS8.treesls --prefix TopoTest_
 A tree is rejected if its p-value < 0.05 (marked with a - sign) for KH, SH and AU tests.
 _bp-RELL_ and _c-ELW_ return posterior weights which are not p-values. The weights sum up to 1 across the trees tested.
 
-### STEP 6.5: Test the hypothesis of equal frequencies.
+### STEP 6.8: Test the hypothesis of equal frequencies.
 
 Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and sites (sCF) supporting the two alternative topologies differ significantly as implemented in Lanfear’s R script (Minh et al., 2020) in R v.4.1.2 (R Core Team, 2021).
 ***[Script saved in "Scripts" folder]
 
-### STEP 6.6: Visualise and analyse the trees
+### STEP 6.9: Visualise and analyse the trees.
 
 1. Open all nex.treefile from the ML and BI analyses in FigTree and root at the outgroup.
 2. Align nodes and view in increasing order.
@@ -398,11 +481,13 @@ Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and si
 ***[Nodes with UFBoot2 ≥ 95, PP ≥ 95 and SH-aLRT ≥ 80 were considered well supported (Minh et al., 2020b).]
 ***[Nodes with sCF values below 33% and gCF values that are lower than sCF values or near zero require further attention].
 
-### STEP 6.7: Comparing species trees to gene trees under the multispecies coalescent model.
+## STEP 7: Multispecies coalescent model
 
-#### STEP 6.7.1: ASTRAL
+Estimates the effects of gene-tree conflict on species-tree inference. 
 
-1. Estimate individual gene trees for the 13 PCGs and 2 rRNAs based on the ML criterion in IQ-Tree.
+### STEP 7.1: ASTRAL
+
+1. Estimate individual gene trees for the 13 PCGs and 2 rRNAs based on the ML criterion in IQ-Tree used the cleaned and edited single gene alignments.
 Use a greedy model selection strategy (-m MFP)and the NNI approach to search for tree topology and compute branch supports with 1000 bootstrapped replicates of the UFBoot2 approach (Hoang et al., 2018).
 ```
 for gene in *.fas
@@ -439,13 +524,13 @@ java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15
 java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15G.tre -t `10 -o elasmo-mitophy-15G-scored-t10.tre
 ```
 
-#### STEP 6.7.2: SVDQuartets
+### STEP 7.2: SVDQuartets
 
-1. Create a nexus file using Dataset 2: 13PCGs_2rRNAs_NT. Use the gene partitions from partition scheme 5 (Table 4).
+1. Create a nexus file using Dataset 2: 13PCGs_2rRNAs_NT. Use the gene partitions from partition scheme 5.
 2. Open the nexus file in PAUP* v4.0a 169 (Swofford, 2003).
 3. Implement the multispecies coalescent tree model with random quartet sampling of 100,000 replicates and 1,000 bootstrap replicates (https://phylosolutions.com/tutorials/svdq-qage/svdq-qage-tutorial.html).
 
-### STEP 6.8: Constructing consensus trees
+### STEP 8: Consensus tree construction
 
 Save the best supported trees above (with bootstrap values) in newick format.
 Navigate the the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and make a new project.
