@@ -482,4 +482,4 @@ Navigate the the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and
 Import the newick file.
 Adjust size and layout and select bootstrap values.
 Import annotations.[^9]
-[^9] Annotations are provided as winn2023-evolview-tree-annotations in "5_Scripts".
+[^9]: Annotations are provided as winn2023-evolview-tree-annotations in "5_Scripts".
