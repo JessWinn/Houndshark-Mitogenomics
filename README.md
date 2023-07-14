@@ -10,7 +10,7 @@ Here we present, for the first time, the Ion Torrent® next-generation sequencin
 
 1. Check sequence quality in FastQC (http://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
 2. Trim adaptors and poor-quality bases (phred score below 16) and remove reads shorter than 25 base pairs (bp) in Torrent Suite Version 5.16.[^1]
-[^1]: Trimmed sequencing reads in BAM format can be found in the "1_Quality control of sequencing data" folder.
+[^1]: Trimmed sequencing reads in BAM format can be found in the "1_Raw Ion Torrent® NGS data" folder.
 
 ## STEP 2: Mitogenome assembly
 
@@ -60,8 +60,7 @@ spades.py \
 
 1. Align the three assemblies to each other using the Geneious alignment tool with default parameters. 
 2. Check each alignment for discrepancies on  Geneious and edit maually to obtain the final genome sequence.
-3. If there is a significant discrepancy between the three alignments further investigation is warranted. We Sanger sequenced a region of our _Galeorhinus galeus_ mitogenome that we could not find a consensus on when comparing our three assemblies. We compared the Sanger sequence fragment to our three assemblies and found that it matched a section of the _de novo_ assembly that the reference assembly failed to detect. The full details on this step can be found in the Supplementary material of Winn et al. (2023).[^2]
-[^2]: All our mitogenome assemblies are in the folder "2_Mitogenome assembly".
+3. If there is a significant discrepancy between the three alignments further investigation is warranted. We Sanger sequenced a region of our _Galeorhinus galeus_ mitogenome that we could not find a consensus on when comparing our three assemblies. We compared the Sanger sequence fragment to our three assemblies and found that it matched a section of the _de novo_ assembly that the reference assembly failed to detect. The full details on this step can be found in the Supplementary material of Winn et al. (2023).
 
 ## STEP 3: Mitogenome annotation
 
@@ -70,8 +69,8 @@ spades.py \
 3. Follow the guidelines for submission to GenBank using Bankit (https://www.ncbi.nlm.nih.gov/WebSub/). After submission, download and save the GenBank files in this folder and import them into Geneious (version 2019.1.3).
 3. Check the annotated sequences in Geneious to ensure completeness and manually count overlapping regions and intergenic spaces between PCGs, rRNAs, tRNAs, and non-coding regions.
 4. Calculate A+T and G+T content and relative synonymous codon usage (RSCU) of PCGs in DAMBE v. 7.0.35 (Xia, 2001). Base composition skewness formula: AT-skew = [A-T]/[A + T] and GC-skew = [G-C]/[G + C] (Perna and Kocher, 1995). 
-5. Make graphs for nucleotide composition and RSCU in R.
-***[See Nucleotide composition and RSCU scripts in "3_Mitogenome annotation" folder.]
+5. Make graphs for nucleotide composition and RSCU in R. [^2]
+[^2]: winn2023-nucleotide-composition-plots and winn2023-codon-usage-plots can be found in the "5_Scripts" folder.]
 8. Predict tRNA secondary structure using the generalized vertebrate mitochondrial tRNA settings in ARWEN v. 1.2.3 (Björn Canbäck Bioinformatics) (Laslett and Canbäck, 2008) and the tRNAscanSE webserver v. 2.0 (http://lowelab.ucsc.edu/cgi-bin/tRNAscan-SE2.cgi) (Lowe and Chan, 2016).
 9. Characterise control region repetitive regions using the “Tandem Repeat Finder” webserver (https://tandem.bu.edu/trf/trf.html) (Benson, 1999) maintaining default settings.
 10. Download the graphic produced by MitoAnnotator and save the files as a png. Edit and enlarge gene names and incude species-specific images, gene numbers and total length in the center.[^3]
@@ -88,7 +87,7 @@ spades.py \
 ```
 cat *.gb > winn_2023.gb.
 ```
-[^4]: GenBank files and accession number lists for our dataset are in the folder "Sequence Alignment and concatenation". 
+[^4]: GenBank files and accession number lists for our dataset are in the folder "2_Galeomorphii mitogenome sequences". 
 
 ### STEP 4.2: Gene region extractions
 
@@ -146,14 +145,14 @@ done
 8. Concatenate the 13 PCGs in Geneious 2019.2.1 and save as 13PCGs_NT (Dataset 1) in fasta, nexus and phyllip format.
 9. Concatenate the 13 PCGs and 2 rRNA genes in Geneious and save as 13PCGs_2rRNAs_NT (Dataset 2) in fasta, nexus and phyllip format.
 10. Translate 13PCGs_NT and save as 13PCGs_AA (Dataset 3) in fasta, nexus and phyllip format.
-11. Make and save length summaries with the length and alignment locations of each alignment to use for the partition files.
+11. Make and save length summaries with the length and alignment locations of each alignment to use for the partition files.[^5]
+[^5]: Concatenated datasets can be found in the folder "3_Multiple sequence alignments".
 
 ## STEP 5: Substitution saturation and _a priori_ data partitioning
 
 ### STEP 5.1: Test for nucleotide saturation.
 
-1. Perform two-tailed tests to examine the degree of nucleotide substitution saturation (Xia et al., 2003) for each gene and each codon position of the 13PCGs as well as on the entire 13_PCGs_NT and 13PCGs_rRNAs_NT datasets, taking into account the proportion of invariant sites as recommended by Xia and Lemey (2009), in DAMBE v.7.2.141 (Xia, 2018).[^5]
-[^5]: Single genes and concatenated datasets can be found in the folder "5_Substitution saturation and data partitioning".
+1. Perform two-tailed tests to examine the degree of nucleotide substitution saturation (Xia et al., 2003) for each gene and each codon position of the 13PCGs as well as on the entire 13_PCGs_NT and 13PCGs_rRNAs_NT datasets, taking into account the proportion of invariant sites as recommended by Xia and Lemey (2009), in DAMBE v.7.2.141 (Xia, 2018).
 3. Visually inspect substitution saturation by plotting the number of transitions (s) and transversions (v) versus divergence.
 Divergence is based on genetic distances derived from the Kimura two-parameter (K2P or K80) substitution model (Kimura, 1980). 
 The K80 substitution model accommodates transition/transversion rate. 
@@ -166,9 +165,9 @@ Dataset 1: one partition for the entire alignement, 13 paritions for each PCG.
 Dataset 2: one partition for the entire alignment, two paritions (rRNA and PCGs), 15 partitions (for each rRNA and PCG), 28 partitions (for each rRNA and for codon position 1 and 2), 28 partitions (for each rRNA and for codon position 1 and 3), 41 partitions (for each rRNA and for each codon position in each PCG).
 Dataset 3: one partition for the entire alignment, 13 partitions for each PCG.
 
-## STEP 6: Mitophylogenomic reconstruction[^6]
+## STEP 6: Mitophylogenomic reconstruction[^5][^6]
 
-[^6]: Partition files and alignment Datasets are saved in "6_Mitophylogenomic reconstruction".
+[^6]: Partition files are available in "4_Partition Files".
 
 ### STEP 6.1: Use MODELFINDER v. 1.6.12 (Kalyaanamoorthy et al., 2017) in IQTree v. 2.1.3 (Minh et al., 2020) to determine the best partitioning scheme and corresponding evolutionary models to use in a Maximum Likelihood analysis.
 
@@ -308,7 +307,7 @@ for g in *.nex
 		mb -i $g
 	done
 ```
-[^7]: Scripts to plot MrBayes log files are stored as kmisc.R, mb_plots.R in "Scripts" folder - https://rdrr.io/github/kmiddleton/kmmisc/man/plot_mrb.html.
+[^7]: Scripts to plot MrBayes log files are stored as kmisc.R, mb_plots.R in "5_Scripts" - https://rdrr.io/github/kmiddleton/kmmisc/man/plot_mrb.html.
 
 ### STEP 6.6: Compute confordance factors
 
@@ -413,8 +412,9 @@ _bp-RELL_ and _c-ELW_ return posterior weights which are not p-values. The weigh
 
 ### STEP 6.8: Test the hypothesis of equal frequencies.
 
-Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and sites (sCF) supporting the two alternative topologies differ significantly as implemented in Lanfear’s R script (Minh et al., 2020) in R v.4.1.2 (R Core Team, 2021).
-***[Script saved in "Scripts" folder]
+1. Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and sites (sCF) supporting the two alternative topologies differ significantly as implemented in Lanfear’s R script (Minh et al., 2020) in R v.4.1.2 (R Core Team, 2021).
+2. Construct plots comparing gCF and sCF values with UFBoot2 values using Lanfear’s R script. [^8]
+[^8]: winn2023-concordance-factors-plots script is in the folder "5_Scripts". 
 
 ### STEP 6.9: Visualise and analyse the trees.
 
@@ -429,11 +429,10 @@ Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and si
 ## STEP 7: Multispecies coalescent model
 
 Estimates the effects of gene-tree conflict on species-tree inference.
-***[Input files are in the folder "7_Multispecies coalescent model".]
 
 ### STEP 7.1: ASTRAL
 
-1. Estimate individual gene trees for the 13 PCGs and 2 rRNAs based on the ML criterion in IQ-Tree used the cleaned and edited single gene alignments.
+1. Estimate individual gene trees for the 13 PCGs and 2 rRNAs based on the ML criterion in IQ-Tree used the cleaned and edited single gene alignments created in Step 4.3.
 Use a greedy model selection strategy (-m MFP)and the NNI approach to search for tree topology and compute branch supports with 1000 bootstrapped replicates of the UFBoot2 approach (Hoang et al., 2018).
 ```
 for gene in *.fas
@@ -472,7 +471,7 @@ java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15
 
 ### STEP 7.2: SVDQuartets
 
-1. Create a nexus file using Dataset 2: 13PCGs_2rRNAs_NT. Use the gene partitions from partition scheme 5.
+1. Create a nexus file using Dataset 2: Galeomorphii_13PCGs_2rRNAs_NT.[^5] Use the gene partitions from PS05.[^6]
 2. Open the nexus file in PAUP* v4.0a 169 (Swofford, 2003).
 3. Implement the multispecies coalescent tree model with random quartet sampling of 100,000 replicates and 1,000 bootstrap replicates (https://phylosolutions.com/tutorials/svdq-qage/svdq-qage-tutorial.html).
 
@@ -482,5 +481,5 @@ Save the best supported trees above (with bootstrap values) in newick format.
 Navigate the the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and make a new project.
 Import the newick file.
 Adjust size and layout and select bootstrap values.
-Import annotations.
-***[See annotations script in "8_Consensus tree construction" folder.]
+Import annotations.[^9]
+[^9] Annotations are provided as winn2023-evolview-tree-annotations in "5_Scripts".
