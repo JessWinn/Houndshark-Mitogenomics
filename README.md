@@ -1,10 +1,16 @@
-# Bioinformatics pipeline of Winn et al. (2023) - Triakid Mitophylogenomics
+# Bioinformatics pipeline of Winn _et al_. (2023) - Triakid Mitophylogenomics
+
+## Bacground 
+
+Complex evolutionary patterns in the mitochondrial genome (mitogenome) of the most species-rich order, the Carcharhiniforms (groundsharks) has yielded challenges in phylogenomic reconstruction of families and genera belonging to it, particularly in the family Triakidae (houndsharks), where there are arguments for both monophyly and paraphyly. We hypothesized that opposing resolutions are a product of the a priori partitioning scheme selected. Accordingly, we employed an extensive statistical framework to select our partitioning scheme for inference of the mitochondrial phylogenomic relationships within Carcharhiniforms and used the multi-species coalescent model to account for the influence of gene tree discordance on species tree inference. We included five new houndshark mitogenomes to increase resolution of Triakidae and uncovered a 714 bp-duplication in the assembly of _Galeorhinus galeus_. Phylogenetic reconstruction confirmed monophyly within Triakidae and the existence of two clades of the expanded _Mustelus_ genus, alluding to the evolutionary reversal of reproductive mode from placental to aplacental. 
+
+Here we present, for the first time, the Ion Torrent® next-generation sequencing (NGS) data and the complete mitochondrial genomes (mitogenomes) of five houndsharks (Chondrichthyes: Triakidae), which include _Galeorhinus galeus_ (17,487 bp; GenBank accession number ON652874), _Mustelus asterias_ (16,708; ON652873), _Mustelus mosis_ (16,755; ON075077), _Mustelus palumbes_ (16,708; ON075076), and _Triakis megalopterus_ (16746; ON075075). We also present the code used to assemble and annotate their mitogenomes, prepare alignments, partition our datasets, assign models of evolution, infer phylogenies based on traditional concatenation approaches as well as under the multispecies coalescent model (MSCM), and generate statistical data for comparison of different topological outcomes. The data and code presented in this paper can be used by other researchers to delve deeper into the phylogenetic relationships of Carcharhiniformes (groundsharks) and the diversification of triakid species as mitogenomes accumulate in public repositories.
 
 ## STEP 1: Quality control of Ion GeneStudio™ S5 sequencing data
 
 1. Check sequence quality in FastQC (http://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
-2. Trim adaptors and poor-quality bases (phred score below 16) and remove reads shorter than 25 base pairs (bp) in Torrent Suite Version 5.16.
-***[Trimmed sequencing reads in BAM format can be found in the "1_Quality control of sequencing data" folder.]
+2. Trim adaptors and poor-quality bases (phred score below 16) and remove reads shorter than 25 base pairs (bp) in Torrent Suite Version 5.16.[^1]
+[^1]: Trimmed sequencing reads in BAM format can be found in the "1_Raw Ion Torrent® NGS data" folder.
 
 ## STEP 2: Mitogenome assembly
 
@@ -17,7 +23,9 @@
 1. Extract reads that mapped to the reference genome in bam format.
 2. Feed the reads into a _de novo_ pipeline in SPAdes version 3.15 with the input set for unpaired Ion Torrent reads with 8 threads, kmers 21,33,55,77,99,127, the careful option to reduce the number of mismatches and short indels and all other parameters left as default.
 EXAMPLE - _Mustelus palumbes_
-```
+
+```bash
+
 #!/bin/bash
 module load app/SPAdes
 spades.py \
@@ -34,7 +42,8 @@ spades.py \
 
 1. Directly map raw reads (bam format) _de novo_.
 EXAMPLE - _Mustelus palumbes_
-```
+
+```bash
 #!/bin/bash
 module load app/SPAdes
 spades.py \
@@ -52,7 +61,6 @@ spades.py \
 1. Align the three assemblies to each other using the Geneious alignment tool with default parameters. 
 2. Check each alignment for discrepancies on  Geneious and edit maually to obtain the final genome sequence.
 3. If there is a significant discrepancy between the three alignments further investigation is warranted. We Sanger sequenced a region of our _Galeorhinus galeus_ mitogenome that we could not find a consensus on when comparing our three assemblies. We compared the Sanger sequence fragment to our three assemblies and found that it matched a section of the _de novo_ assembly that the reference assembly failed to detect. The full details on this step can be found in the Supplementary material of Winn et al. (2023).
-***[All our mitogenome assemblies are in the folder "2_Mitogenome assembly".]
 
 ## STEP 3: Mitogenome annotation
 
@@ -61,12 +69,12 @@ spades.py \
 3. Follow the guidelines for submission to GenBank using Bankit (https://www.ncbi.nlm.nih.gov/WebSub/). After submission, download and save the GenBank files in this folder and import them into Geneious (version 2019.1.3).
 3. Check the annotated sequences in Geneious to ensure completeness and manually count overlapping regions and intergenic spaces between PCGs, rRNAs, tRNAs, and non-coding regions.
 4. Calculate A+T and G+T content and relative synonymous codon usage (RSCU) of PCGs in DAMBE v. 7.0.35 (Xia, 2001). Base composition skewness formula: AT-skew = [A-T]/[A + T] and GC-skew = [G-C]/[G + C] (Perna and Kocher, 1995). 
-5. Make graphs for nucleotide composition and RSCU in R.
-***[See Nucleotide composition and RSCU scripts in "3_Mitogenome annotation" folder.]
+5. Make graphs for nucleotide composition and RSCU in R. [^2]
+[^2]: winn2023-nucleotide-composition-plots and winn2023-codon-usage-plots can be found in the "5_Scripts" folder.]
 8. Predict tRNA secondary structure using the generalized vertebrate mitochondrial tRNA settings in ARWEN v. 1.2.3 (Björn Canbäck Bioinformatics) (Laslett and Canbäck, 2008) and the tRNAscanSE webserver v. 2.0 (http://lowelab.ucsc.edu/cgi-bin/tRNAscan-SE2.cgi) (Lowe and Chan, 2016).
 9. Characterise control region repetitive regions using the “Tandem Repeat Finder” webserver (https://tandem.bu.edu/trf/trf.html) (Benson, 1999) maintaining default settings.
-10. Download the graphic produced by MitoAnnotator and save the files as a png. Edit and enlarge gene names and incude species-specific images, gene numbers and total length in the center.
-***[Fully annotated GenBank files of each of our newly assembled mitogenomes can be found on GenBank with accession numbers ON075075, ON075076, ON075077, ON652873, and ON652874.]
+10. Download the graphic produced by MitoAnnotator and save the files as a png. Edit and enlarge gene names and incude species-specific images, gene numbers and total length in the center.[^3]
+[^3]: Fully annotated GenBank files of each of our newly assembled mitogenomes can be found on GenBank with accession numbers ON075075, ON075076, ON075077, ON652873, and ON652874.
 
 ## STEP 4: Sequence alignment and concatenation
 
@@ -75,11 +83,11 @@ spades.py \
 1. Save the five newly assembled houndshark mitogenomes in Genbank (full) format.
 2. Compile a list of mitogenome accession numbers from Wang et al. 2022 and Kousteni et al. 2021 as well as four outgroups each from the Lamniform and Orectolobiform orders and save the text file as kousteni-wang_mitogenomes_genbank.list.
 3. Use kousteni-wang_mitogenomes_genbank.list in a Batch Entrez (https://www.ncbi.nlm.nih.gov/sites/batchentrez) search to retrieve and download the mitogenome records in Genbank (full) format as a file named kousteni-wang.gb.
-4. Merge kousteni-wang.gb and the five newly assembled mitogenomes.
+4. Merge kousteni-wang.gb and the five newly assembled mitogenomes.[^4]
 ```
 cat *.gb > winn_2023.gb.
 ```
-***[GenBank files and accession number lists for our dataset are in the folder "Sequence Alignment and concatenation".] 
+[^4]: GenBank files and accession number lists for our dataset are in the folder "2_Galeomorphii mitogenome sequences". 
 
 ### STEP 4.2: Gene region extractions
 
@@ -97,7 +105,8 @@ For instance, some GenBank records denote 12S rRNA as s-rRNA, 12S ribosomal RNA 
 Standardize all genes to the following code:  'ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA'.
 4. Save the edited file as `winn_2023.cds-rrna.std.fasta´.
 5. Extract individual gene sequences (.fa) from winn_2023.cds-rrna.std.fasta using the custom script maduna2022-gene-extractions.sh:
-```
+
+```bash
 #!/bin/bash
 GENE=('ATP6' 'ATP8' 'COX1' 'COX2' 'COX3' 'CYTB' 'ND1' 'ND2' 'ND3' 'ND4;' 'ND4L' 'ND5' 'ND6' '12SrRNA' '16SrRNA')
 for g in "${GENE[@]}"
@@ -118,7 +127,8 @@ for f in *.fa
 1. Create a new folder called 2a_MACSE2. Download the latest version of MACSE and save 'macse_v2.06.jar' at present, in the folder.
 2. Check that the extracted protein coding genes  (PCGs) from 1b_GeneExtract are in the correct orientation in Geneious 2019.2.1 and save them as .fasta files in 2a_MACSE2.
 3. Align the PCGs using the for loop script maduna2022-13pcgs-msa.sh.
-```
+
+```bash
 #!/bin/bash
 datadir=./2a_MACSE2
 for i in $datadir/*.fa
@@ -135,14 +145,14 @@ done
 8. Concatenate the 13 PCGs in Geneious 2019.2.1 and save as 13PCGs_NT (Dataset 1) in fasta, nexus and phyllip format.
 9. Concatenate the 13 PCGs and 2 rRNA genes in Geneious and save as 13PCGs_2rRNAs_NT (Dataset 2) in fasta, nexus and phyllip format.
 10. Translate 13PCGs_NT and save as 13PCGs_AA (Dataset 3) in fasta, nexus and phyllip format.
-11. Make and save length summaries with the length and alignment locations of each alignment to use for the partition files.
+11. Make and save length summaries with the length and alignment locations of each alignment to use for the partition files.[^5]
+[^5]: Concatenated datasets can be found in the folder "3_Multiple sequence alignments".
 
 ## STEP 5: Substitution saturation and _a priori_ data partitioning
 
 ### STEP 5.1: Test for nucleotide saturation.
 
 1. Perform two-tailed tests to examine the degree of nucleotide substitution saturation (Xia et al., 2003) for each gene and each codon position of the 13PCGs as well as on the entire 13_PCGs_NT and 13PCGs_rRNAs_NT datasets, taking into account the proportion of invariant sites as recommended by Xia and Lemey (2009), in DAMBE v.7.2.141 (Xia, 2018).
-***[Single genes and concatenated datasets can be found in the folder "5_Substitution saturation and data partitioning".]
 3. Visually inspect substitution saturation by plotting the number of transitions (s) and transversions (v) versus divergence.
 Divergence is based on genetic distances derived from the Kimura two-parameter (K2P or K80) substitution model (Kimura, 1980). 
 The K80 substitution model accommodates transition/transversion rate. 
@@ -155,9 +165,9 @@ Dataset 1: one partition for the entire alignement, 13 paritions for each PCG.
 Dataset 2: one partition for the entire alignment, two paritions (rRNA and PCGs), 15 partitions (for each rRNA and PCG), 28 partitions (for each rRNA and for codon position 1 and 2), 28 partitions (for each rRNA and for codon position 1 and 3), 41 partitions (for each rRNA and for each codon position in each PCG).
 Dataset 3: one partition for the entire alignment, 13 partitions for each PCG.
 
-## STEP 6: Mitophylogenomic reconstruction
+## STEP 6: Mitophylogenomic reconstruction[^5][^6]
 
-***[Partition files and alignment Datasets are saved in "6_Mitophylogenomic reconstruction".]
+[^6]: Partition files are available in "4_Partition Files".
 
 ### STEP 6.1: Use MODELFINDER v. 1.6.12 (Kalyaanamoorthy et al., 2017) in IQTree v. 2.1.3 (Minh et al., 2020) to determine the best partitioning scheme and corresponding evolutionary models to use in a Maximum Likelihood analysis.
 
@@ -167,7 +177,8 @@ The maximum number of rate categories, cmax, is set to 20 since it is likely to 
 3 CPU cores, T, are used to decrease computational burden.
 
 1. 13 PCGs_NT
-```
+
+```bash
 #!/bin/bash
 module load app/IQTREE/2.1.3
 cd *./13PCGs
@@ -175,7 +186,8 @@ iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS1/PS1.txt -pre PS1/PS1_run01_mf -m MF+ME
 iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS5/PS5.txt -pre PS5/PS5_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
 ```
 2. 13PCGs_2rRNAs_NT
-```
+
+```bash
 #!/bin/bash
 module load app/IQTREE/2.1.3
 cd *./13PCGs_2rRNAs
@@ -189,7 +201,8 @@ iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS7/PS7.txt -pre PS7/PS7_run01_mf -
 iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS8/PS8.txt -pre PS8/PS8_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
 ```
 3. 13PCGs_AA
-```
+
+```bash
 #!/bin/bash
 module load app/IQTREE/2.1.3
 cd *./13PCGs
@@ -197,7 +210,7 @@ iqtree2 -s 13PCGs_AA.fasta -st AA -p PS1/PS1AA.txt -pre PS1/PS1AA_run01_mf -m MF
 iqtree2 -s 13PCGs_AA.fasta -st AA -p PS5/PS5AA.txt -pre PS5/PS5AA_run01_mf -m MF+MERGE -AICc -rcluster 30 -T 3 -cmax 20
 ```
 
-***[Repeat the above using the Bayesian Information Critereon (BIC).]
+Repeat the above using the Bayesian Information Critereon (BIC)
 
 ### STEP 6.2: Use MODELFINDER in IQTree to determine the best partitioning scheme & corresponding evolutionary models to use in BI analyses.
 
@@ -205,7 +218,7 @@ Apply secondary model selection for the best-fitting partitioning identified by 
 Rerun ModelFinder with options: -m TESTONLY -mset mrbayes to restrict the results to models supported by MrBayes.
 
 1. 13PCGs_NT
-```
+```bash
 #!/bin/bash
 module load app/IQTREE/2.1.3
 cd *./13PCGs
@@ -213,7 +226,8 @@ iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS1/PS1_run01_mf.best_scheme.nex -pre PS1/
 iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS5/PS5_run01_mf.best_scheme.nex -pre PS5/PS5_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
 ```
 2. 13PCGs_2rRNAs
-```
+
+```bash
 #!/bin/bash
 module load app/IQTREE/2.1.3
 cd *./13PCGs_2rRNAs
@@ -227,7 +241,8 @@ iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS7/PS7_run01_mf.best_scheme.nex -p
 iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS8/PS8_run01_mf.best_scheme.nex -pre PS8/PS8_run01_mf -m TESTONLY -AICc -T AUTO -mset mrbayes
 ```
 3. 13PCGs_AA
-```
+
+```bash
 #!/bin/bash
 module load app/IQTREE/2.1.3
 cd *./13PCGs
@@ -247,7 +262,8 @@ Use the Nearest Neighbor Interchange (NNI) approach to search for tree topology.
 Compute branch supports with 1000 replicates of the Shimodaira-Hasegawa approximate likelihood-ratio test (SH-aLRT; Anisimova and Gascuel, 2006) and the ultrafast bootstrapping (UFBoot2) approach (Hoang et al., 2018).
 
 1. 13PCGs_NT
-```
+
+```bash
 #!/bin/bash
 module load app/IQTREE/1.6.12
 cd ./13PCGs
@@ -255,7 +271,8 @@ iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS1/PS1_run01_mf.best_model.nex -pre PS1/P
 iqtree2 -s 13PCGs_NT.fasta -st DNA -p PS5/PS5_run01_mf.best_model.nex -pre PS5/PS5_run02_ml -T 3 -B 1000 -alrt 1000
 ```
 2. 13PCGs_2rRNAs_NT
-```
+
+```bash
 #!/bin/bash
 module load app/IQTREE/1.6.12
 cd ./13PCGs_2rRNAs
@@ -269,7 +286,8 @@ iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS7/PS7_run01_mf.best_model.nex -pr
 iqtree2 -s 13PCGs_2rRNAs_NT.fasta -st DNA -p PS8/PS8_run01_mf.best_model.nex -pre PS8/PS8_run02_ml -T 3 -B 1000 -alrt 1000
 ```
 3. 13PCGs_AA
-```
+
+```bash
 #!/bin/bash
 module load app/IQTREE/1.6.12
 cd ./13PCGs
@@ -277,18 +295,19 @@ iqtree2 -s 13PCGs_AA.fasta -st AA -p PS1/PS1AA_run01_mf.best_model.nex -pre PS1/
 iqtree2 -s 13PCGs_AA.fasta -st AA -p PS5/PS5AA_run01_mf.best_model.nex -pre PS5/PS5AA_run02_ml -T 3 -B 1000 -alrt 1000
 ```
 
-### STEP 6.5: Perform Bayesian Inference analysis using the Cyberinfrastructure for Phylogenetic Research (CIPRES) Science Gateway portal v. 3.3 (www.phylo.org) at the San Diego Supercomputer Center (Miller et al., 2010).
+### STEP 6.5: Perform Bayesian Inference analysis using the Cyberinfrastructure for Phylogenetic Research (CIPRES) Science Gateway portal v. 3.3 (www.phylo.org) at the San Diego Supercomputer Center (Miller et al., 2010).[^7]
 
 1. Run a pair of independent searches for 5 million generations, with trees saved every 1,000 generations and the first 2,500 sampled trees of each search discarded as burn-in. 
 2. Screen the model parameter summary statistics Estimated Sample Size (ESS) and Potential Scale Reduction Factor (PSRF), where convergence occurred at ESS >200, and PSRF ~1.0. 
-```
+
+```bash
 #!/bin/bash
 for g in *.nex
 	do
 		mb -i $g
 	done
 ```
-***[Scripts to plot MrBayes log files are stored as kmisc.R, mb_plots.R in "Scripts" folder - https://rdrr.io/github/kmiddleton/kmmisc/man/plot_mrb.html.]
+[^7]: Scripts to plot MrBayes log files are stored as kmisc.R, mb_plots.R in "5_Scripts" - https://rdrr.io/github/kmiddleton/kmmisc/man/plot_mrb.html.
 
 ### STEP 6.6: Compute confordance factors
 
@@ -296,7 +315,8 @@ Investigate topological conflict around each branch of the species tree by calcu
 Infer concatenation-based species trees with 1000 ultrafast bootstraps and an edge-linked partition model.
 
 1. 13PCGs_NT
-```
+
+```bash
 #!/bin/bash
 module load app/IQTREE/1.6.12
 cd ./13PCGs
@@ -315,7 +335,8 @@ iqtree2 -t PS5/PS5_run03_concat.condonpart.MF.treefile --gcf PS5/PS5_run03_loci.
 ```
 
 2. 13PCGs_2rRNAs_NT
-```
+
+```bash
 #!/bin/bash
 module load app/IQTREE/1.6.12
 cd ./13PCGs_2rRNAs
@@ -352,7 +373,8 @@ iqtree2 -t PS8/PS8_run03_concat.condonpart.MF.treefile --gcf PS8/PS8_run03_loci.
 ```
 
 3. 13PCGs_AA
-```
+
+```bash
 #!/bin/bash
 module load app/IQTREE/1.6.12
 cd ./13PCGs
@@ -379,7 +401,7 @@ Compare the trees from the eight runs to determine significant diﬀerences with
 5. Perform weighted KH and weighted SH tests (-zw).
 6. Conduct an approximately unbiased (AU) test (Shimodaira, 2002) (-au).
 
-```
+```bash
 #!/bin/bash
 module load app/IQTREE/1.6.12
 cd ./13PCGs_2rRNAs
@@ -390,8 +412,9 @@ _bp-RELL_ and _c-ELW_ return posterior weights which are not p-values. The weigh
 
 ### STEP 6.8: Test the hypothesis of equal frequencies.
 
-Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and sites (sCF) supporting the two alternative topologies differ significantly as implemented in Lanfear’s R script (Minh et al., 2020) in R v.4.1.2 (R Core Team, 2021).
-***[Script saved in "Scripts" folder]
+1. Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and sites (sCF) supporting the two alternative topologies differ significantly as implemented in Lanfear’s R script (Minh et al., 2020) in R v.4.1.2 (R Core Team, 2021).
+2. Construct plots comparing gCF and sCF values with UFBoot2 values using Lanfear’s R script. [^8]
+[^8]: winn2023-concordance-factors-plots script is in the folder "5_Scripts". 
 
 ### STEP 6.9: Visualise and analyse the trees.
 
@@ -406,11 +429,10 @@ Conduct a χ2-test to determine whether the frequency of gene trees (gCF) and si
 ## STEP 7: Multispecies coalescent model
 
 Estimates the effects of gene-tree conflict on species-tree inference.
-***[Input files are in the folder "7_Multispecies coalescent model".]
 
 ### STEP 7.1: ASTRAL
 
-1. Estimate individual gene trees for the 13 PCGs and 2 rRNAs based on the ML criterion in IQ-Tree used the cleaned and edited single gene alignments.
+1. Estimate individual gene trees for the 13 PCGs and 2 rRNAs based on the ML criterion in IQ-Tree used the cleaned and edited single gene alignments created in Step 4.3.
 Use a greedy model selection strategy (-m MFP)and the NNI approach to search for tree topology and compute branch supports with 1000 bootstrapped replicates of the UFBoot2 approach (Hoang et al., 2018).
 ```
 for gene in *.fas
@@ -449,7 +471,7 @@ java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15
 
 ### STEP 7.2: SVDQuartets
 
-1. Create a nexus file using Dataset 2: 13PCGs_2rRNAs_NT. Use the gene partitions from partition scheme 5.
+1. Create a nexus file using Dataset 2: Galeomorphii_13PCGs_2rRNAs_NT.[^5] Use the gene partitions from PS05.[^6]
 2. Open the nexus file in PAUP* v4.0a 169 (Swofford, 2003).
 3. Implement the multispecies coalescent tree model with random quartet sampling of 100,000 replicates and 1,000 bootstrap replicates (https://phylosolutions.com/tutorials/svdq-qage/svdq-qage-tutorial.html).
 
@@ -459,5 +481,5 @@ Save the best supported trees above (with bootstrap values) in newick format.
 Navigate the the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and make a new project.
 Import the newick file.
 Adjust size and layout and select bootstrap values.
-Import annotations.
-***[See annotations script in "8_Consensus tree construction" folder.]
+Import annotations.[^9]
+[^9]: Annotations are provided as winn2023-evolview-tree-annotations in "5_Scripts".
