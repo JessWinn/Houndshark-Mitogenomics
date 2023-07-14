@@ -1,0 +1,7 @@
+#nexus
+begin sets;
+  charset 13PCGs_pos1 = DNA, 1-11403\3;
+  charset 13PCGs_pos3 = DNA, 3-11403\3;
+  charset 12S = DNA, 11404-12329;
+  charset 16S = DNA, 12330-13945;
+end;
