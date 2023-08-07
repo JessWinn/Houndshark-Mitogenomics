@@ -10,13 +10,13 @@ Here we present, for the first time, the Ion Torrent® next-generation sequencin
 
 1. Check sequence quality in FastQC (http://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
 2. Trim adaptors and poor-quality bases (phred score below 16) and remove reads shorter than 25 base pairs (bp) in Torrent Suite Version 5.16.[^1]
-[^1]: Trimmed sequencing reads in BAM format can be found in the "1_Raw Ion Torrent® NGS data" folder.
 
 ## STEP 2: Mitogenome assembly
 
 ### STEP 2.1: Reference-based assembly
 
 1. Align raw reads to the _Mustelus mustelus_ mitogenome (NC_039629.1) using the Geneious read mapper with medium sensitivity settings and five iterations in Geneious Prime (version 2019.1.3).
+[^1]: Trimmed and reference-filtered sequencing reads in BAM format can be found in the "1_Raw Ion Torrent® NGS data" folder.
 
 ### STEP 2.2: Hybrid assembly
 
@@ -60,7 +60,7 @@ spades.py \
 
 1. Align the three assemblies to each other using the Geneious alignment tool with default parameters. 
 2. Check each alignment for discrepancies on  Geneious and edit maually to obtain the final genome sequence.
-3. If there is a significant discrepancy between the three alignments further investigation is warranted. We Sanger sequenced a region of our _Galeorhinus galeus_ mitogenome that we could not find a consensus on when comparing our three assemblies. We compared the Sanger sequence fragment to our three assemblies and found that it matched a section of the _de novo_ assembly that the reference assembly failed to detect. The full details on this step can be found in the Supplementary material of Winn et al. (2023).
+3. If there is a significant discrepancy between the three alignments further investigation is warranted. We Sanger sequenced a region of our _Galeorhinus galeus_ mitogenome that we could not find a consensus on when comparing our three assemblies. We compared the Sanger sequence fragment to our three assemblies in Geneious and found that it matched a section of the _de novo_ assembly that the reference assembly failed to detect. The full details on this step can be found in the Supplementary material of Winn et al. (2023).
 
 ## STEP 3: Mitogenome annotation
 
@@ -71,7 +71,7 @@ spades.py \
 4. Calculate A+T and G+T content and relative synonymous codon usage (RSCU) of PCGs in DAMBE v. 7.0.35 (Xia, 2001). Base composition skewness formula: AT-skew = [A-T]/[A + T] and GC-skew = [G-C]/[G + C] (Perna and Kocher, 1995). 
 5. Make graphs for nucleotide composition and RSCU in R. [^2]
 [^2]: winn2023-nucleotide-composition-plots and winn2023-codon-usage-plots can be found in the "5_Scripts" folder.]
-8. Predict tRNA secondary structure using the generalized vertebrate mitochondrial tRNA settings in ARWEN v. 1.2.3 (Björn Canbäck Bioinformatics) (Laslett and Canbäck, 2008) and the tRNAscanSE webserver v. 2.0 (http://lowelab.ucsc.edu/cgi-bin/tRNAscan-SE2.cgi) (Lowe and Chan, 2016).
+8. Predict tRNA secondary structure using the generalized vertebrate mitochondrial tRNA settings in ARWEN v. 1.2.3 (Björn Canbäck Bioinformatics) (Laslett and Canbäck, 2008) and the tRNAscanSE webserver v. 2.0 (http://lowelab.ucsc.edu/cgi-bin/tRNAscan-SE2.cgi) (Lowe and Chan, 2016). We also used the MXfold2 webserver (http://ws.sato-lab.org/mxfold2/) to verify the secondary structure of the duplicate tRNA-Thr in _Galeorhinus galeus_.
 9. Characterise control region repetitive regions using the “Tandem Repeat Finder” webserver (https://tandem.bu.edu/trf/trf.html) (Benson, 1999) maintaining default settings.
 10. Download the graphic produced by MitoAnnotator and save the files as a png. Edit and enlarge gene names and incude species-specific images, gene numbers and total length in the center.[^3]
 [^3]: Fully annotated GenBank files of each of our newly assembled mitogenomes can be found on GenBank with accession numbers ON075075, ON075076, ON075077, ON652873, and ON652874.
