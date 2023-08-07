@@ -159,11 +159,10 @@ The K80 substitution model accommodates transition/transversion rate.
 Bias and the ‘K80 distance’ is expected to increase linearly with divergence time.
 See: https://www.researchgate.net/publication/232048505_Assesing_substitution_saturation_with_DAMBE for a more detailed tutorial.
 
- ### STEP 5.2: Construct 10 partition nexus files, two for dataset 1, six for dataset 2 and two for dataset 3.
+ ### STEP 5.2: Construct partition nexus files.
 
-Dataset 1: one partition for the entire alignement, 13 paritions for each PCG.
-Dataset 2: one partition for the entire alignment, two paritions (rRNA and PCGs), 15 partitions (for each rRNA and PCG), 28 partitions (for each rRNA and for codon position 1 and 2), 28 partitions (for each rRNA and for codon position 1 and 3), 41 partitions (for each rRNA and for each codon position in each PCG).
-Dataset 3: one partition for the entire alignment, 13 partitions for each PCG.
+Dataset 1 & 3: one partition for the entire alignement, 13 paritions for each PCG.
+Dataset 2: one partition for the entire alignment, five paritions (codon: pos1 + pos2 + pos3 + 2 rRNAs ), four partitions (codon: pos1_pos2 + pos3 + 2 rRNAs), four partitions (codon: pos1 + pos3 + 2 rRNAs), 15 partitions for each PCG and 2 rRNAs, 41 partitions (geneXcodon: 13 PCGs pos1 + 13 pos2 + 13 pos2 + 2 rRNAs), 28 partitions (geneXCodon: 13 PCGs pos1_pos2 + 13 PCGs pos3 + 2 rRNAs), 28 partitions (geneXcodon: 13 PCGs pos1 + 13 PCGs pos3 + 2 rRNAs).
 
 ## STEP 6: Mitophylogenomic reconstruction[^5][^6]
 
