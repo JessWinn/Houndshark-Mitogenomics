@@ -9,7 +9,7 @@ Here we present, for the first time, the Ion Torrent® next-generation sequencin
 ## STEP 1: Quality control of Ion GeneStudio™ S5 sequencing data
 
 1. Check sequence quality in FastQC (http://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
-2. Trim adaptors and poor-quality bases (phred score below 16) and remove reads shorter than 25 base pairs (bp) in Torrent Suite Version 5.16.[^1]
+2. Trim adaptors and poor-quality bases (phred score below 20) and remove reads shorter than 25 base pairs (bp) in Torrent Suite Version 5.16.[^1]
 
 ## STEP 2: Mitogenome assembly
 
@@ -70,7 +70,7 @@ spades.py \
 3. Check the annotated sequences in Geneious to ensure completeness and manually count overlapping regions and intergenic spaces between PCGs, rRNAs, tRNAs, and non-coding regions.
 4. Calculate A+T and G+T content and relative synonymous codon usage (RSCU) of PCGs in DAMBE v. 7.0.35 (Xia, 2001). Base composition skewness formula: AT-skew = [A-T]/[A + T] and GC-skew = [G-C]/[G + C] (Perna and Kocher, 1995). 
 5. Make graphs for nucleotide composition and RSCU in R. [^2]
-[^2]: winn2023-nucleotide-composition-plots and winn2023-codon-usage-plots can be found in the "5_Scripts" folder.]
+[^2]: winn2023-nucleotide-composition-plots and winn2023-codon-usage-plots can be found in the "5_Scripts" folder.
 8. Predict tRNA secondary structure using the generalized vertebrate mitochondrial tRNA settings in ARWEN v. 1.2.3 (Björn Canbäck Bioinformatics) (Laslett and Canbäck, 2008) and the tRNAscanSE webserver v. 2.0 (http://lowelab.ucsc.edu/cgi-bin/tRNAscan-SE2.cgi) (Lowe and Chan, 2016). We also used the MXfold2 webserver (http://ws.sato-lab.org/mxfold2/) to verify the secondary structure of the duplicate tRNA-Thr in _Galeorhinus galeus_.
 9. Characterise control region repetitive regions using the “Tandem Repeat Finder” webserver (https://tandem.bu.edu/trf/trf.html) (Benson, 1999) maintaining default settings.
 10. Download the graphic produced by MitoAnnotator and save the files as a png. Edit and enlarge gene names and incude species-specific images, gene numbers and total length in the center.[^3]
@@ -159,7 +159,7 @@ The K80 substitution model accommodates transition/transversion rate.
 Bias and the ‘K80 distance’ is expected to increase linearly with divergence time.
 See: https://www.researchgate.net/publication/232048505_Assesing_substitution_saturation_with_DAMBE for a more detailed tutorial.
 
- ### STEP 5.2: Construct partition nexus files.
+### STEP 5.2: Construct partition nexus files.
 
 Dataset 1 & 3: one partition for the entire alignement, 13 paritions for each PCG.
 Dataset 2: one partition for the entire alignment, five paritions (codon: pos1 + pos2 + pos3 + 2 rRNAs ), four partitions (codon: pos1_pos2 + pos3 + 2 rRNAs), four partitions (codon: pos1 + pos3 + 2 rRNAs), 15 partitions for each PCG and 2 rRNAs, 41 partitions (geneXcodon: 13 PCGs pos1 + 13 pos2 + 13 pos2 + 2 rRNAs), 28 partitions (geneXCodon: 13 PCGs pos1_pos2 + 13 PCGs pos3 + 2 rRNAs), 28 partitions (geneXcodon: 13 PCGs pos1 + 13 PCGs pos3 + 2 rRNAs).
@@ -477,7 +477,7 @@ java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15
 ## STEP 8: Consensus tree construction
 
 Save the best supported trees above (with bootstrap values) in newick format.
-Navigate the the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and make a new project.
+Navigate to the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and make a new project.
 Import the newick file.
 Adjust size and layout and select bootstrap values.
 Import annotations.[^9]
