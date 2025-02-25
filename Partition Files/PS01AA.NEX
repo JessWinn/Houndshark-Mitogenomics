@@ -1,4 +1,0 @@
-#nexus
-begin sets;
-  charset none = AA, 1 - 3800;
-end;

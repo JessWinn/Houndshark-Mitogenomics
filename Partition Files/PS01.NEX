@@ -1,4 +1,0 @@
-#nexus
-begin sets;
-  charset none = DNA, 1 - 13945;
-end;
