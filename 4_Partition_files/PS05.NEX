@@ -1,0 +1,18 @@
+#nexus
+begin sets;
+  charset ATP6 = DNA, 1 - 681;
+  charset ATP8 = DNA, 682 - 846;
+  charset COX1 = DNA, 847 - 2400;
+  charset COX2 = DNA, 2401 - 3090;
+  charset COX3 = DNA, 3091 - 3873;
+  charset CYTB = DNA, 3874 - 5016;
+  charset ND1 = DNA, 5017 - 5988;
+  charset ND2 = DNA, 5989 - 7035;
+  charset ND3 = DNA, 7036 - 7383;
+  charset ND4 = DNA, 7384 - 8763;
+  charset ND4L = DNA, 8764 - 9057;
+  charset ND5 = DNA, 9058 - 10884;
+  charset ND6 = DNA, 10885 - 11403;
+  charset 12S = DNA, 11404 - 12329;
+  charset 16S = DNA, 12330 - 13945;
+end;

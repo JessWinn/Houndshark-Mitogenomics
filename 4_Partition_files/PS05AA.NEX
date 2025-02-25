@@ -1,0 +1,16 @@
+#nexus
+begin sets;
+  charset ATP6 = AA, 1 - 227;
+  charset ATP8 = AA, 228 - 282;
+  charset COX1 = AA, 283 - 800;
+  charset COX2 = AA, 801 - 1030;
+  charset COX3 = AA, 1031 - 1291;
+  charset CYTB = AA, 1292 - 1672;
+  charset ND1 = AA, 1673 - 1996;
+  charset ND2 = AA, 1997 - 2345;
+  charset ND3 = AA, 2346 - 2461;
+  charset ND4 = AA, 2462 - 2921;
+  charset ND4L = AA, 2922 - 3019;
+  charset ND5 = AA, 3020 - 3628;
+  charset ND6 = AA, 3629 - 3800;
+end;
