@@ -2,9 +2,9 @@
 
 ## Background 
 
-Complex evolutionary patterns in the mitochondrial genome (mitogenome) of the most species-rich order, the Carcharhiniforms (groundsharks) has yielded challenges in phylogenomic reconstruction of families and genera belonging to it, particularly in the family Triakidae (houndsharks), where there are arguments for both monophyly and paraphyly. We hypothesized that opposing resolutions are a product of the a priori partitioning scheme selected. Accordingly, we employed an extensive statistical framework to select our partitioning scheme for inference of the mitochondrial phylogenomic relationships within Carcharhiniforms and used the multi-species coalescent model to account for the influence of gene tree discordance on species tree inference. We included five new houndshark mitogenomes to increase resolution of Triakidae and uncovered a 714 bp-duplication in the assembly of _Galeorhinus galeus_. Phylogenetic reconstruction confirmed monophyly within Triakidae and the existence of two clades of the expanded _Mustelus_ genus, alluding to the evolutionary reversal of reproductive mode from placental to aplacental. 
+Complex evolutionary patterns in the mitochondrial genome (mitogenome) of the most species-rich order, the Carcharhiniforms (groundsharks) has yielded challenges in phylogenomic reconstruction of families and genera belonging to it, particularly in the family Triakidae (houndsharks), where there are arguments for both monophyly and paraphyly. We hypothesized that opposing resolutions are a product of the _a priori_ partitioning scheme selected. Accordingly, we employed an extensive statistical framework to select our partitioning scheme for inference of the mitochondrial phylogenomic relationships within Carcharhiniforms and used the multispecies coalescent model to account for the influence of gene tree discordance on species tree inference. We included five new houndshark mitogenomes to increase resolution of Triakidae and uncovered a 714 bp-duplication in the assembly of _Galeorhinus galeus_. Phylogenetic reconstruction confirmed monophyly within Triakidae and the existence of two clades of the expanded _Mustelus_ genus, alluding to the evolutionary reversal of reproductive mode from placental to aplacental. 
 
-Here we present, for the first time, the Ion Torrent® next-generation sequencing (NGS) data and the complete mitochondrial genomes (mitogenomes) of five houndsharks (Chondrichthyes: Triakidae), which include _Galeorhinus galeus_ (17,488 bp; GenBank accession number ON652874), _Mustelus asterias_ (16,708; ON652873), _Mustelus mosis_ (16,755; ON075077), _Mustelus palumbes_ (16,708; ON075076), and _Triakis megalopterus_ (16746; ON075075). We also present the code used to assemble and annotate their mitogenomes, prepare alignments, partition our datasets, assign models of evolution, infer phylogenies based on traditional concatenation approaches as well as under the multispecies coalescent model (MSCM), and generate statistical data for comparison of different topological outcomes. The data and code presented in this paper can be used by other researchers to delve deeper into the phylogenetic relationships of Carcharhiniformes (groundsharks) and the diversification of triakid species as mitogenomes accumulate in public repositories.
+Here we present, for the first time, the Ion Torrent® next-generation sequencing (NGS) data and the complete mitochondrial genomes (mitogenomes) of five houndsharks (Chondrichthyes: Triakidae), which include _Galeorhinus galeus_ (17,488 bp; GenBank accession number ON652874), _Mustelus asterias_ (16,708; ON652873), _Mustelus mosis_ (16,755; ON075077), _Mustelus palumbes_ (16,708; ON075076), and _Triakis megalopterus_ (16746; ON075075). We also present the code used to assemble and annotate their mitogenomes, prepare alignments, partition our datasets, assign models of evolution, infer phylogenies based on traditional site homogenous concatenation approaches as well as under the multispecies coalescent model (MSCM) and site heterogenous models, and generate statistical data for comparison of different topological outcomes. The data and code presented in this paper can be used by other researchers to delve deeper into the phylogenetic relationships of Carcharhiniformes (groundsharks) and the diversification of triakid species as mitogenomes accumulate in public repositories.
 
 ## STEP 1: Quality control of Ion GeneStudio™ S5 sequencing data
 
@@ -425,7 +425,16 @@ _bp-RELL_ and _c-ELW_ return posterior weights which are not p-values. The weigh
 ***[Nodes with UFBoot2 ≥ 95, PP ≥ 95 and SH-aLRT ≥ 80 were considered well supported (Minh et al., 2020b).]
 ***[Nodes with sCF values below 33% and gCF values that are lower than sCF values or near zero require further attention].
 
-## STEP 7: Multispecies coalescent model
+### STEP 6.10: Contruct a consensus tree
+
+1. Save the best supported trees above (with bootstrap values) in newick format.
+2. Navigate to the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and make a new project.
+3. Import the newick file.
+4. Adjust size and layout and select bootstrap values.
+5. Import annotations.[^9]
+[^9]: Annotations are provided as winn2023-evolview-tree-annotations in "5_Scripts".
+
+## STEP 7: Multispecies coalescent modelling
 
 Estimates the effects of gene-tree conflict on species-tree inference.
 
@@ -474,11 +483,242 @@ java -jar astral.5.7.8.jar -q elasmo-mitophy-15G-ASTRAL.tre -i elasmo-mitophy-15
 2. Open the nexus file in PAUP* v4.0a 169 (Swofford, 2003).
 3. Implement the multispecies coalescent tree model with random quartet sampling of 100,000 replicates and 1,000 bootstrap replicates (https://phylosolutions.com/tutorials/svdq-qage/svdq-qage-tutorial.html).
 
-## STEP 8: Consensus tree construction
+## STEP 8: Site heterogenous models
 
-Save the best supported trees above (with bootstrap values) in newick format.
-Navigate to the Evolview v3 webpage (https://www.evolgenius.info/evolview/) and make a new project.
-Import the newick file.
-Adjust size and layout and select bootstrap values.
-Import annotations.[^9]
-[^9]: Annotations are provided as winn2023-evolview-tree-annotations in "5_Scripts".
+### STEP 8.1: Test for compositional heterogeneity among lineages with AliGROOVE 
+
+Use AliGROOVE to test for compositional heterogeneity among lineages in the nucleotide (Data_14_Galeomorphii_13PCGs_NT.fasta and Data_17_Galeomorphii_13PCGs_2rRNAs_NT.fasta) and amino acid datasets (Data_20_Galeomorphii_13PCGs_AA.fasta). For nucleotide alignments, run the software with the -N option to treat indels as ambiguous characters and tested it without invoking -N so that indels were treated as a fifth character trait.
+```
+aligroove = ./bin/AliGROOVE
+
+# Without invoking the -N option: indels are treated as 5th character
+$aligroove/AliGROOVE_v.1.08.pl -i Data_14_Galeomorphii_13PCGs_NT.fasta
+$aligroove/AliGROOVE_v.1.08.pl -i Data_17_Galeomorphii_13PCGs_2rRNAs_NT.fasta
+$aligroove/AliGROOVE_v.1.08.pl -i Data_20_Galeomorphii_13PCGs_AA.fasta
+
+# With -N option: indels are treated as ambiguous characters (only possible for nucleotide alignments)
+$aligroove/AliGROOVE_v.1.08.pl -N -i Data_14_Galeomorphii_13PCGs_NT.fasta
+$aligroove/AliGROOVE_v.1.08.pl -N -i Data_17_Galeomorphii_13PCGs_2rRNAs_NT.fasta
+```
+### STEP 8.2: Test for compositional heterogeneity among lineages with BaCoCa
+
+Run BaCoCa with default settings, invoking the -r option of the program to generate heat maps in combination with hierarchical clustering.
+```
+Bacoca = ./BaCoCa_v1.1_Skript_Perl
+perl $bacoca/BaCoCa.v1.109.r.pl -i 13PCGs_2rRNAs_NT.fasta -P 13PCGs_2rRNAs_NT.part.txt -r
+```
+### STEP 8.3: Test different models for phylogenetic reconstruction with PHYLOBAYES_MPI 
+
+Conduct BI analyses using the pb_mpi program of the PHYLOBAYES_MPI package. Run two independent Markov chain Monte Carlo (MCMC) chains per model (GTR + G4, CAT + Poisson + G4, CAT + GTR + G4, and C60 + GTR + G4 for amino acids only) for each supermatrix (Data_15_Galeomorphii_13PCGs_NT.phy, Data_18_Galeomorphii_13PCGs_2rRNAs_NT.phy, Data_21_Galeomorphii_13PCGs_AA.phy) for as long as time allows for your project. We ran our chains for several days before checking convergence. Convergence of independent runs can be assessed using maximum difference (maxdiff) in all bipartitions and effective sample size (ESS) following the guidelines specified in the PHYLOBAYES_MPI manual (https://github.com/bayesiancook/phylobayes/blob/master/pbManual4.1.pdf). The bpcomp program is used to generate outputs of the largest (maxdiff) and mean (meandiff) discrepancies observed across all bipartitions, while the tracecomp program is used to estimate the ESS and discrepancy for the summary variables of the models. For both programs, we used a conservative burn-in of 20% of the length of MCMC chain.
+```
+phylobayes = ./data
+mod_sel = ./scripts 
+```
+1. The GTR model
+```
+# Dataset 1: 13PCGs_NT
+mpirun -np 8 $phylobayes/pb_mpi -ncat 1 -gtr -d Data_15_Galeomorphii_13PCGs_NT.phy GTR_13PCGs_NT_chain1 &
+mpirun -np 8 $phylobayes/pb_mpi -ncat 1 -gtr -d Data_15_Galeomorphii_13PCGs_NT.phy 
+GTR_13PCGs_NT_chain2 &
+$phylobayes/tracecomp GTR_13PCGs_NT_chain?.trace -o GTR_13PCGs_NT_tracecomp
+$phylobayes/bpcomp -x 813 10 GTR_13PCGs_NT_chain1 GTR_13PCGs_NT_chain2 -o GTR_13PCGs_NT_bpcomp
+
+# Dataset 2: 13PCGs_rRNAs_NT
+mpirun -np 8 $phylobayes/pb_mpi -ncat 1 -gtr -d Data_18_Galeomorphii_13PCGs_2rRNAs_NT.phy GTR_13PCGs_2rRNAs_NT_chain1 &
+mpirun -np 8 $phylobayes/pb_mpi -ncat 1 -gtr -d Data_18_Galeomorphii_13PCGs_2rRNAs_NT.phy GTR_13PCGs_2rRNAs_NT_chain2 &
+$phylobayes/tracecomp GTR_13PCGs_2rRNAs_NT_chain?.trace -o GTR_13PCGs_2rRNAs_NT_tracecomp
+$phylobayes/bpcomp -x 764 10 GTR_13PCGs_2rRNAs_NT_chain1 GTR_13PCGs_2rRNAs_NT_chain2 -o GTR_13PCGs_2rRNAs_NT_bpcomp
+
+# Dataset 3: 13PCGs_AA
+mpirun -np 8 $phylobayes/pb_mpi -ncat 1 -gtr -d Data_21_Galeomorphii_13PCGs_AA.phy  GTR_AA_chain1 &
+mpirun -np 8 $phylobayes/pb_mpi -ncat 1 -gtr -d Data_21_Galeomorphii_13PCGs_AA.phy GTR_AA_chain2 &
+$phylobayes/tracecomp GTR_AA_chain?.trace -o GTR_AA_tracecomp
+$phylobayes/bpcomp -x 1373 10 GTR_AA_chain1 GTR_AA_chain2 -o GTR_AA_bpcomp
+```
+2. The CAT-Poisson (CAT-F81) model
+```
+# Dataset 1: 13PCGs_NT
+mpirun -np 24 $phylobayes/pb_mpi -cat -poisson -d Data_15_Galeomorphii_13PCGs_NT.phy CAT-POISSON_13PCGs_NT_chain1 &
+mpirun -np 24 $phylobayes/pb_mpi -cat -poisson -d Data_15_Galeomorphii_13PCGs_NT.phy CAT-POISSON_13PCGs_NT_chain2 &
+$phylobayes/tracecomp CAT-POISSON_13PCGs_NT_chain?.trace -o CAT-POISSON_13PCGs_NT_tracecomp
+$phylobayes/bpcomp -x 2350 10 CAT-POISSON_13PCGs_NT_chain1 CAT-POISSON_13PCGs_NT_chain2 -o CAT-POISSON_13PCGs_NT_bpcomp
+
+# Dataset 2: 13PCGs_2rRNAs_NT
+mpirun -np 24 $phylobayes/pb_mpi -cat -poisson -d Data_18_Galeomorphii_13PCGs_2rRNAs_NT.phy CAT-POISSON_13PCGs_2rRNAs_NT_chain1 &
+mpirun -np 24 $phylobayes/pb_mpi -cat -poisson -d Data_18_Galeomorphii_13PCGs_2rRNAs_NT.phy CAT-POISSON_13PCGs_2rRNAs_NT_chain2 &
+$phylobayes/tracecomp CAT-POISSON_13PCGs_2rRNAs_NT_chain?.trace -o CAT-POISSON_13PCGs_2rRNAs_NT_tracecomp -x 3500
+$phylobayes/bpcomp -x 3500 10 CAT-POISSON_13PCGs_2rRNAs_NT_chain1 CAT-POISSON_13PCGs_2rRNAs_NT_chain2 -o CAT-POISSON_13PCGs_2rRNAs_NT_bpcomp
+
+# Dataset 3: 13PCGs_AA
+mpirun -np 24 $phylobayes/pb_mpi -cat -poisson -d Data_21_Galeomorphii_13PCGs_AA.phy CAT-POISSON_AA_chain1 &
+mpirun -np 24 $phylobayes/pb_mpi -cat -poisson -d Data_21_Galeomorphii_13PCGs_AA.phy CAT-POISSON_AA_chain2 &
+$phylobayes/tracecomp CAT-POISSON_AA_chain?.trace -o CAT-POISSON_AA_tracecomp
+$phylobayes/bpcomp -x 2601 10 CAT-POISSON_AA_chain1 CAT-POISSON_AA_chain2 -o CAT-POISSON_AA_bpcomp
+```
+3. The CAT-GTR model
+```
+# Dataset 1: 13PCGs_NT
+mpirun -np 24 $phylobayes/pb_mpi -d Data_15_Galeomorphii_13PCGs_NT.phy CAT-GTR_13PCGs_NT_chain1
+mpirun -np 24 $phylobayes/pb_mpi -d Data_15_Galeomorphii_13PCGs_NT.phy CAT-GTR_13PCGs_NT_chain2
+$phylobayes/tracecomp CAT-GTR_13PCGs_NT_chain1.trace CAT-GTR_13PCGs_NT_chain2.trace -o CAT-GTR_13PCGs_NT_tracecomp
+$phylobayes/bpcomp -x 7564 10 CAT-GTR_13PCGs_NT_chain1 CAT-GTR_13PCGs_NT_chain2 -o CAT-GTR_13PCGs_NT_bpcomp
+
+# Dataset 2: 13PCGs_2rRNAs_NT
+mpirun -np 24 $phylobayes/pb_mpi -d Data_18_Galeomorphii_13PCGs_2rRNAs_NT.phy CAT-GTR_13PCGs_2rRNAs_NT_chain1
+mpirun -np 24 $phylobayes/pb_mpi -d Data_18_Galeomorphii_13PCGs_2rRNAs_NT.phy CAT-GTR_13PCGs_2rRNAs_NT_chain2
+$phylobayes/tracecomp CAT-GTR_13PCGs_2rRNAs_NT_chain1.trace CAT-GTR_13PCGs_2rRNAs_NT_chain2.trace -o CAT-GTR_13PCGs_2rRNAs_NT_tracecomp
+$phylobayes/bpcomp -x 6170 10 CAT-GTR_13PCGs_2rRNAs_NT_chain1 CAT-GTR_13PCGs_2rRNAs_NT_chain2 -o CAT-GTR_13PCGs_2rRNAs_NT_bpcomp
+
+# Dataset 3: 13PCGs_AA
+mpirun -np 24 $phylobayes/pb_mpi -d Data_21_Galeomorphii_13PCGs_AA.phy CAT-GTR_AA_chain1
+mpirun -np 24 $phylobayes/pb_mpi -d Data_21_Galeomorphii_13PCGs_AA.phy CAT-GTR_AA_chain2
+$phylobayes/tracecomp CAT-GTR_AA_chain1.trace CAT-GTR_AA_chain2.trace -o CAT-GTR_AA_tracecomp
+$phylobayes/bpcomp -x 3900 10 CAT-GTR_AA_chain1 CAT-GTR_AA_chain2 -o CAT-GTR_AA_bpcomp
+```
+4. C60-GTR model (AA only)
+```
+# Dataset 3: 13PCGs_AA
+mpirun -np 24 $phylobayes/pb_mpi -catfix c60 -gtr -d Data_21_Galeomorphii_13PCGs_AA.phy C60-GTR_AA_chain1
+mpirun -np 24 $phylobayes/pb_mpi -catfix c60 -gtr -d Data_21_Galeomorphii_13PCGs_AA.phy C60-GTR_AA_chain2
+$phylobayes/tracecomp C60-GTR_AA_chain?.trace -o C60-GTR_AA_tracecomp
+$phylobayes/bpcomp -x 2469 10 C60-GTR_AA_chain1 C60-GTR_AA_chain2 -o C60-GTR_AA_bpcomp
+```
+### STEP 8.4: Check chain convergence
+
+1. Generate site-specific log-likelihood statistics for the different models with the readpb_mpi program. Use a burn-in of 20% of the length of the MCMC chain and thin accordingly to obtain a total of at least 100 MCMC points given the computational intensiveness of estimating site log-likelihoods under the CAT models.
+```
+phylobayes = ./data
+
+# Dataset 1: 13PCGs_NT
+mpirun -np 48 $phylobayes/readpb_mpi -x 813 32 -sitelogl GTR_13PCGs_NT_chain1
+mpirun -np 48 $phylobayes/readpb_mpi -x 813 32 -sitelogl GTR_13PCGs_NT_chain2 
+mpirun -np 48 $phylobayes/readpb_mpi -x 2350 94 -sitelogl CAT-POISSON_13PCGs_NT_chain1
+mpirun -np 48 $phylobayes/readpb_mpi -x 2350 94 -sitelogl CAT-POISSON_13PCGs_NT_chain2 
+mpirun -np 48 $phylobayes/readpb_mpi -x 7564 300 -sitelogl CAT-GTR_13PCGs_NT_chain1
+mpirun -np 48 $phylobayes/readpb_mpi -x 7564 300 -sitelogl CAT-GTR_13PCGs_NT_chain2
+
+# Dataset 2: 13PCGs_rRNAs_NT
+mpirun -np 48 $phylobayes/readpb_mpi -x 764 30 -sitelogl GTR_13PCGs_2rRNAs_NT_chain1
+mpirun -np 48 $phylobayes/readpb_mpi -x 764 30 -sitelogl GTR_13PCGs_2rRNAs_NT_chain2 
+mpirun -np 48 $phylobayes/readpb_mpi -x 3500 47 -sitelogl CAT-POISSON_13PCGs_2rRNAs_NT_chain1
+mpirun -np 48 $phylobayes/readpb_mpi -x 3500 47 -sitelogl CAT-POISSON_13PCGs_2rRNAs_NT_chain2
+mpirun -np 48 $phylobayes/readpb_mpi -x 6170 242 -sitelogl CAT-GTR_13PCGs_2rRNAs_NT_chain1
+mpirun -np 48 $phylobayes/readpb_mpi -x 6170 242 -sitelogl CAT-GTR_13PCGs_2rRNAs_NT_chain2
+
+# Dataset 3: 13PCGs_AA
+mpirun -np 48 $phylobayes/readpb_mpi -x 1373 54 -sitelogl GTR_AA_chain1
+mpirun -np 48 $phylobayes/readpb_mpi -x 1373 54 -sitelogl GTR_AA_chain
+mpirun -np 48 $phylobayes/readpb_mpi -x 2469 98 -sitelogl C60-GTR_AA_chain1
+mpirun -np 48 $phylobayes/readpb_mpi -x 2469 98 -sitelogl C60-GTR_AA_chain2
+mpirun -np 48 $phylobayes/readpb_mpi -x 2601 104 -sitelogl CAT-POISSON_AA_chain1
+mpirun -np 48 $phylobayes/readpb_mpi -x 2601 104 -sitelogl CAT-POISSON_AA_chain2
+mpirun -np 48 $phylobayes/readpb_mpi -x 3900 154 -sitelogl CAT-GTR_AA_chain1
+mpirun -np 48 $phylobayes/readpb_mpi -x 3900 154 -sitelogl CAT-GTR_AA_chain2
+```
+2. Collect the site-specific scores.
+```
+# Dataset 1: 13PCGs_NT
+python3 ../scripts/read_loocv_waic.py GTR_13PCGs_NT_chain?.sitelogl
+python3 ../scripts/read_loocv_waic.py CAT-POISSON_13PCGs_NT_chain?.sitelogl
+python3 ../scripts/read_loocv_waic.py CAT-GTR_13PCGs_NT_chain?.sitelogl
+
+# Dataset 2: 13PCGs_rRNAs_NT
+python3 ../scripts/read_loocv_waic.py GTR_13PCGs_2rRNAs_NT_chain?.sitelogl
+python3 ../scripts/read_loocv_waic.py CAT-POISSON_13PCGs_2rRNAs_NT_chain?.sitelogl
+python3 ../scripts/read_loocv_waic.py CAT-GTR_13PCGs_2rRNAs_NT_chain?.sitelogl
+
+# Dataset 3: 13PCGs_AA
+python3 ../scripts/read_loocv_waic.py GTR_AA_chain?.sitelogl
+python3 ../scripts/read_loocv_waic.py CAT-POISSON_AA_chain?.sitelogl
+python3 ../scripts/read_loocv_waic.py C60-GTR_AA_chain?.sitelogl
+python3 ../scripts/read_loocv_waic.py CAT-GTR_AA_chain?.sitelogl
+```
+3. Generate scores for the widely applicable information criterion (wAIC) and the asymptotically equivalent leave one-out cross-validation (LOO-CV) [7375] using the script read_loocv_waic.py, which is provided as part of the PHYLOBAYES_MPI package.
+```
+# Load the package
+library(coda)
+
+# Read the data
+chain1 <- read.table("CAT-GTR_AA_chain1_reduced2matchchanin2.trace",header=TRUE)
+chain2 <- read.table("CAT-GTR_AA_chain2.trace",header=TRUE)
+chain3 <- read.table("CAT-GTR_13PCGs_NT_chain1.trace",header=TRUE)
+chain4 <- read.table("CAT-GTR_13PCGs_NT_chain2_reduced2matchchanin1.trace",header=TRUE)
+chain5 <- read.table("CAT-GTR_13PCGs_2rRNAs_NT_chain1.trace",header=TRUE)
+chain6 <- read.table("CAT-GTR_13PCGs_2rRNAs_NT_chain2_reduced2matchchanin1.trace",header=TRUE)
+
+# Create an MCMC object with the correct thinning interval (used 1000).
+chain1 <- mcmc(chain1,thin=100)
+chain2 <- mcmc(chain2,thin=100)
+chain3 <- mcmc(chain3,thin=100)
+chain4 <- mcmc(chain4,thin=100)
+chain5 <- mcmc(chain5,thin=100)
+chain6 <- mcmc(chain6,thin=100)
+
+# Always start with a plot. A rough way of verifying convergence is to plot the trace and the posterior distribution of some of the parameters.
+pdf("CAT-GTR_AA_chain1.trace.plot.pdf", width=10, height=10)
+plot(chain1)
+.=dev.off()
+pdf("CAT-GTR_AA_chain2.trace.plot.pdf", width=10, height=10)
+plot(chain2)
+.=dev.off()
+pdf("CAT-GTR_13PCGs_NT_chain1.trace.plot.pdf", width=10, height=10)
+plot(chain3)
+.=dev.off()
+pdf("CAT-GTR_13PCGs_NT_chain2.trace.plot.pdf", width=10, height=10)
+plot(chain5)
+.=dev.off()
+pdf("CAT-GTR_13PCGs_2rRNAs_NT_chain1.trace.plot.pdf", width=10, height=10)
+plot(chain5)
+.=dev.off()
+pdf("CAT-GTR_13PCGs_2rRNAs_NT_chain2.trace.plot.pdf", width=10, height=10)
+plot(chain6)
+.=dev.off()
+
+# Obtaining summary statistics for the MCMC chain. 
+summary(chain1)
+summary(chain2)
+summary(chain3)
+summary(chain4)
+summary(chain5)
+summary(chain6)
+
+# Is the sample from the MCMC large enough? 
+autocorr.diag(chain1)
+effectiveSize(chain1)
+autocorr.diag(chain2)
+effectiveSize(chain2)
+autocorr.diag(chain3)
+effectiveSize(chain3)
+autocorr.diag(chain4)
+effectiveSize(chain4)
+autocorr.diag(chain5)
+effectiveSize(chain5)
+autocorr.diag(chain6)
+effectiveSize(chain6)
+
+# Has the chain converged? 
+combined.d1 = mcmc.list(chain1,chain2)
+pdf("CAT-GTR_AA_chains-combined.trace.plot.pdf", width=10, height=10)
+plot(combined.d1)
+.=dev.off()
+gelman.diag(combined.d1)
+pdf("CAT-GTR_AA_chains-combined.trace.gelmanplot.pdf", width=10, height=10)
+gelman.plot(combined.d1)
+.=dev.off()
+combined.d2 = mcmc.list(chain3,chain4)
+pdf("CAT-GTR_13PCGs_NT_chains-combined.trace.plot.pdf", width=10, height=10)
+plot(combined.d2)
+.=dev.off()
+gelman.diag(combined.d2)
+pdf("CAT-GTR_13PCGs_NT_chains-combined.trace.gelmanplot.pdf", width=10, height=10)
+gelman.plot(combined.d2)
+.=dev.off()
+combined.d3 = mcmc.list(chain5,chain6)
+pdf("CAT-GTR_13PCGs_2rRNAs_NT_chains-combined.trace.plot.pdf", width=10, height=10)
+plot(combined.d3)
+.=dev.off()
+gelman.diag(combined.d3)
+pdf("CAT-GTR_13PCGs_2rRNAs_NT_chains-combined.trace.gelmanplot.pdf", width=10, height=10)
+gelman.plot(combined.d3)
+.=dev.off()
+```
